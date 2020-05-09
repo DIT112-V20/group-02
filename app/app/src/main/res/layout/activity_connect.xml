@@ -26,8 +26,8 @@
     <ToggleButton
         android:id="@+id/toggleDriveMode"
         style="?android:attr/borderlessButtonStyle"
-        android:layout_width="120dp"
-        android:layout_height="wrap_content"
+        android:layout_width="124dp"
+        android:layout_height="51dp"
         android:background="@drawable/button_help"
         android:text="@string/manual"
         android:textColor="#FFFFFF"
