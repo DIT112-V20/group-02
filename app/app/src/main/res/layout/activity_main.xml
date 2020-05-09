@@ -4,11 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="20dp"
+    android:background="@drawable/background"
     android:gravity="center"
     android:orientation="vertical"
-    tools:context="com.example.app.MainActivity"
-    android:background="@drawable/background">
+    tools:context="com.example.app.MainActivity">
 
     <Button
         android:id="@+id/connect_to_car"
