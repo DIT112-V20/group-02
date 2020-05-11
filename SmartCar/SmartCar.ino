@@ -4,14 +4,13 @@
 #include <VL53L0X.h>
 //#include <WebServer.h>
 //#include <WiFi.h>
-#include <ESPmDNS.h>
+//#include <ESPmDNS.h>
 
 BluetoothSerial bluetooth;
 //WebServer server(80);
 
 // Constansts
-const int rotateSpeed = 5; // speed in % for overRideMotor method
-const float SPEED = 0.8;   // Speed in m/s
+const float SPEED = 0.8;   // Standard Speed in m/s
 const int RIGHT = 90;      // 90 Degrees to turn forward
 const int LEFT = -90;
 const int SIDE_MIN_OBSTACLE = 22;   // Minimum distance for SR04
@@ -248,6 +247,7 @@ void driveBackward() // Manual backwards drive
     car.setAngle(0);
     car.update();
     float currentSpeed = car.getSpeed();
+    // The car will gradually increase the backward speed to reduce motor overloading.
     while (currentSpeed > -SPEED)
     {
         car.setSpeed(currentSpeed -= SPEEDCHANGE);
@@ -284,7 +284,7 @@ void checkRightObstacle()
     atObstacleRight = (rightDistance > 0 && rightDistance <= SIDE_MIN_OBSTACLE) ? true : false;
 }
 
-void improvedAuto() // (╬ ಠ益ಠ)
+void improvedAuto()
 {
     while(autoDrivingEnabled){
         checkFrontObstacle();
@@ -298,7 +298,9 @@ void improvedAuto() // (╬ ಠ益ಠ)
         checkRightObstacle();
         if(atObstacleLeft && !atObstacleRight){rotateOnSpot(RIGHT);}
         if(!atObstacleLeft && atObstacleRight){rotateOnSpot(LEFT);}
-        if(!atObstacleRight && !atObstacleLeft){rotateOnSpot(RIGHT);}    
+        if(!atObstacleRight && !atObstacleLeft){rotateOnSpot(RIGHT);}
+        //TODO Need to refine the driving. At the moment the car just drives forward as standard. We want the car to avoid the obstacle and
+        // then resume the original path.    
     }
 }
 
