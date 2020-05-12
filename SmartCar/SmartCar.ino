@@ -10,14 +10,14 @@ BluetoothSerial bluetooth;
 //WebServer server(80);
 
 // Constansts
-const float SPEED = 0.8;                // Standard Speed in m/s
-const int RIGHT = 90;                   // 90 Degrees to turn on spot right
-const int LEFT = -90;                   // 90 Degrees to turn on spot left
-const int SIDE_MIN_OBSTACLE = 22;       // Minimum distance for SR04
-const int FRONT_MIN_OBSTACLE = 150;     // Minimum distance for Micro-LIDAR
+const float SPEED = 0.8;            // Standard Speed in m/s
+const int RIGHT = 90;               // 90 Degrees to turn on spot right
+const int LEFT = -90;               // 90 Degrees to turn on spot left
+const int SIDE_MIN_OBSTACLE = 22;   // Minimum distance for SR04
+const int FRONT_MIN_OBSTACLE = 150; // Minimum distance for Micro-LIDAR
 const int GYROSCOPE_OFFSET = 13;
-const unsigned int MAX_DISTANCE = 100;  // Max distance to measure with ultrasonic
-const float SPEEDCHANGE = 0.1;          // Used when increasing and decreasing speed. Might need a new more concrete name?
+const unsigned int MAX_DISTANCE = 100; // Max distance to measure with ultrasonic
+const float SPEEDCHANGE = 0.1;         // Used when increasing and decreasing speed. Might need a new more concrete name?
 //const auto ssid = "yourSSID";
 //const auto password = "yourWifiPassword";
 
@@ -25,8 +25,8 @@ const float SPEEDCHANGE = 0.1;          // Used when increasing and decreasing s
 float currentSpeed;
 
 // Unsigned
-unsigned int sideSensorError = 3;       //Errormargin for side sensors
-unsigned int frontSensorError = 30;     //Errormargin for front ensor
+unsigned int sideSensorError = 3;   //Errormargin for side sensors
+unsigned int frontSensorError = 30; //Errormargin for front ensor
 unsigned int frontDistance;
 unsigned int leftDistance;
 unsigned int rightDistance;
@@ -38,16 +38,16 @@ boolean atObstacleRight = false;
 boolean autoDrivingEnabled = false;
 
 // Ultrasonic trigger pins
-const int TRIGGER_PIN = 5;              // Trigger signal
-const int ECHO_PIN = 18;                // Reads signal
+const int TRIGGER_PIN = 5; // Trigger signal
+const int ECHO_PIN = 18;   // Reads signal
 const int TRIGGER_PIN1 = 19;
 const int ECHO_PIN1 = 23;
 
 // Sensor pins
-SR04 leftSensor(TRIGGER_PIN, ECHO_PIN, MAX_DISTANCE);       // Ultrasonic measures in centimeters
+SR04 leftSensor(TRIGGER_PIN, ECHO_PIN, MAX_DISTANCE); // Ultrasonic measures in centimeters
 SR04 rightSensor(TRIGGER_PIN1, ECHO_PIN1, MAX_DISTANCE);
-VL53L0X frontSensor;                                        // Micro LIDAR measures in millimeters
-GY50 gyro(GYROSCOPE_OFFSET);                                // Gyroscope
+VL53L0X frontSensor;         // Micro LIDAR measures in millimeters
+GY50 gyro(GYROSCOPE_OFFSET); // Gyroscope
 
 // Odometer
 const unsigned long PULSES_PER_METER = 600; // TODO CALIBRATE PULSES ON CAR
@@ -66,7 +66,7 @@ SmartCar car(control, gyro, leftOdometer, rightOdometer);
 
 void setup()
 {
-    car.enableCruiseControl();              //Enables Cruisecontrol in order to work with m/s 
+    car.enableCruiseControl(); //Enables Cruisecontrol in order to work with m/s
     Serial.begin(9600);
     Wire.begin();
     frontSensor.setTimeout(500);
@@ -111,9 +111,9 @@ void setup()
 //Rotate on spot function for the automaticDriving
 void rotateOnSpot(int targetDegrees)
 {
-    car.disableCruiseControl();             //Disables cruiseControl in order to use OverrideMotorSpeed
+    car.disableCruiseControl(); //Disables cruiseControl in order to use OverrideMotorSpeed
     int speed = 40;
-    targetDegrees %= 360;                   // Puts it on a (-360,360) scale 
+    targetDegrees %= 360; // Puts it on a (-360,360) scale
 
     if (!targetDegrees)
     {
@@ -152,7 +152,7 @@ void rotateOnSpot(int targetDegrees)
         degreesTurnedSoFar = initialHeading - currentHeading;
     }
     car.setSpeed(0);
-    car.enableCruiseControl();          //ReEnable cruiseControl
+    car.enableCruiseControl(); //ReEnable cruiseControl
 }
 
 // Car rotate for manualControl
@@ -165,7 +165,7 @@ void rotate(int degrees, float speed)
     //Checks if we are driving backward or forward and sets angle accordingly
     if (speed < 0)
     {
-        if (degrees > 0) 
+        if (degrees > 0)
         {
             car.setAngle(LEFT);
         }
@@ -210,7 +210,7 @@ void rotate(int degrees, float speed)
 }
 
 // Manual forward drive
-void driveForward() 
+void driveForward()
 {
     car.setAngle(0);
     car.update();
@@ -223,7 +223,7 @@ void driveForward()
 }
 
 // Manual backwards drive
-void driveBackward() 
+void driveBackward()
 {
     car.setAngle(0);
     car.update();
@@ -290,22 +290,37 @@ void checkRightObstacle()
 
 void automatedDriving()
 {
-    while(autoDrivingEnabled){
+    while (autoDrivingEnabled)
+    {
         checkFrontObstacle();
         //Drive forward until there is an obstacle infron of car.
-        while(!atObstacleFront)
+        while (!atObstacleFront)
         {
             driveForward();
+            writeBluetooth('f');
             checkFrontObstacle();
         }
         stopCar();
+        writeBluetooth('s');
         checkLeftObstacle();
         checkRightObstacle();
-        if(atObstacleLeft && !atObstacleRight){rotateOnSpot(RIGHT);}             // If obstacle at left but not right, trun right.
-        if(!atObstacleLeft && atObstacleRight){rotateOnSpot(LEFT);}         // If obstacle at right but not left, turn left.
-        if(!atObstacleRight && !atObstacleLeft){rotateOnSpot(RIGHT);}       // If both sides are clear, turn right.
-        //TODO Need to refine the driving. At the moment the car just drives forward as standard. We want the car to avoid the obstacle and
-        // then resume the original path. We also need a way to break out of automatic driving.
+        if (atObstacleLeft && !atObstacleRight)
+        {
+            rotateOnSpot(RIGHT);
+            writeBluetooth('r');
+        } // If obstacle at left but not right, turn right.
+        if (!atObstacleLeft && atObstacleRight)
+        {
+            rotateOnSpot(LEFT);
+            writeBluetooth('l');
+        } // If obstacle at right but not left, turn left.
+        if (!atObstacleRight && !atObstacleLeft)
+        {
+            rotateOnSpot(RIGHT);
+            writeBluetooth('r');
+        } // If both sides are clear, turn right.
+        //TODO: Need to refine the driving. At the moment the car just drives forward as standard. We want the car to avoid the obstacle and
+        // then resume the original path. We also need a way to break out of automatic driving(?).
     }
 }
 
@@ -352,11 +367,11 @@ void manualControl(char input)
         break;
 
     case 'k': // Left backwards turn
-        rotate(LEFT, -SPEED); 
+        rotate(LEFT, -SPEED);
         break;
 
     case 'j': // Right backwards turn
-        rotate(RIGHT, -SPEED); 
+        rotate(RIGHT, -SPEED);
         break;
 
     case 'i': // Increases carspeed by 0.1. Not implemented in app yet
@@ -379,7 +394,14 @@ void readBluetooth()
     {
         char input = bluetooth.read();
         //driveOption(input);             // This will hopefully work in order to trigger autoDriving on and off at any time in future implementation
-        manualControl(input);             // Sends input to  the manualcontrol to control the car
+        manualControl(input); // Sends input to  the manualcontrol to control the car
+    }
+}
+
+void writeBluetooth(byte message) 
+{
+    if (bluetooth.hasClient()) {
+        bluetooth.write(&message, 1);
     }
 }
 
