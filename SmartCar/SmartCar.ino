@@ -2,12 +2,8 @@
 #include <BluetoothSerial.h>
 #include <Wire.h>
 #include <VL53L0X.h>
-//#include <WebServer.h>
-//#include <WiFi.h>
-//#include <ESPmDNS.h>
 
 BluetoothSerial bluetooth;
-//WebServer server(80);
 
 // Constansts
 const float SPEED = 0.8;            // Standard Speed in m/s
@@ -186,7 +182,7 @@ void driveForward()
     car.setAngle(0);
     car.update();
     float currentSpeed = car.getSpeed();
-    // Gradualy increase the car speed in order to not overwork the motors.
+    // Gradually increase the car speed in order to not overwork the motors.
     while (currentSpeed < SPEED)
     {
         car.setSpeed(currentSpeed += SPEEDCHANGE);
@@ -212,7 +208,7 @@ void stopCar()
     car.setSpeed(0);
 }
 
-// Not yet used. Will most likley not be used. Here for testing.
+// Not yet used. Will most likely not be used. Here for testing.
 void driveDistance(long distance, float speed)
 {
     long initialDistance = car.getDistance();
@@ -263,6 +259,7 @@ void automatedDriving()
 {
     while (autoDrivingEnabled)
     {
+        readBluetooth();
         checkFrontObstacle();
         //Drive forward until there is an obstacle infron of car.
         while (!atObstacleFront)
@@ -295,30 +292,19 @@ void automatedDriving()
     }
 }
 
-// Not yet properly used, but will eventually trigger AutomaticDriving on and off
-void driveOption(char input)
-{
-    switch (input)
-    {
-    case 'a':
-        autoDrivingEnabled = true;
-        break;
-
-    case 'm':
-        autoDrivingEnabled = false;
-        break;
-    }
-}
-
-// Manual drive inputs
+// Drive inputs
 void manualControl(char input)
 {
     switch (input)
     {
 
-    case 'a':
+    case 'a': // Auto
         autoDrivingEnabled = true;
         automatedDriving();
+        break;
+
+    case 'm': // Manual
+        autoDrivingEnabled = false;
         break;
 
     case 'f': // Forward
@@ -364,7 +350,6 @@ void readBluetooth()
     while (bluetooth.available())
     {
         char input = bluetooth.read();
-        //driveOption(input);             // This will hopefully work in order to trigger autoDriving on and off at any time in future implementation
         manualControl(input); // Sends input to  the manualcontrol to control the car
     }
 }
