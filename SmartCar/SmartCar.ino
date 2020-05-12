@@ -287,6 +287,26 @@ void automatedDriving()
             rotateOnSpot(RIGHT);
             writeBluetooth('r');
         } // If both sides are clear, turn right.
+        // if (atObstacleRight && atObstacleLeft)
+        // {
+        //     while (atObstacleRight && atObstacleLeft)
+        //     { 
+        //         driveBackward();
+        //         writeBluetooth('b');
+        //         checkLeftObstacle();
+        //         checkRightObstacle();
+        //     } // While obstacle is at right and left
+        //     if (atObstacleLeft)
+        //     {
+        //         rotateOnSpot(RIGHT);
+        //         writeBluetooth('r');
+        //     } // If obstacle at left, turn right.
+        //     else if (atObstacleRight)
+        //     {
+        //         rotateOnSpot(LEFT);
+        //         writeBluetooth('l');
+        //     } // If obstacle at right, turn left.
+        // }
         //TODO: Need to refine the driving. At the moment the car just drives forward as standard. We want the car to avoid the obstacle and
         // then resume the original path. We also need a way to break out of automatic driving(?).
     }
@@ -354,9 +374,10 @@ void readBluetooth()
     }
 }
 
-void writeBluetooth(byte message) 
+void writeBluetooth(byte message)
 {
-    if (bluetooth.hasClient()) {
+    if (bluetooth.hasClient())
+    {
         bluetooth.write(&message, 1);
     }
 }
