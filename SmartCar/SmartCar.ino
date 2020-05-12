@@ -29,7 +29,7 @@ unsigned int sideSensorError = 3;       //Errormargin for side sensors
 unsigned int frontSensorError = 30;     //Errormargin for front ensor
 unsigned int frontDistance;
 unsigned int leftDistance;
-unsigned int rightSensor;
+unsigned int rightDistance;
 
 // Boolean
 boolean atObstacleFront = false;
@@ -165,7 +165,7 @@ void rotate(int degrees, float speed)
     //Checks if we are driving backward or forward and sets angle accordingly
     if (speed < 0)
     {
-        if (degrees > 0)
+        if (degrees > 0) 
         {
             car.setAngle(LEFT);
         }
