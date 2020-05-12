@@ -18,8 +18,6 @@ const int FRONT_MIN_OBSTACLE = 150; // Minimum distance for Micro-LIDAR
 const int GYROSCOPE_OFFSET = 13;
 const unsigned int MAX_DISTANCE = 100; // Max distance to measure with ultrasonic
 const float SPEEDCHANGE = 0.1;         // Used when increasing and decreasing speed. Might need a new more concrete name?
-//const auto ssid = "yourSSID";
-//const auto password = "yourWifiPassword";
 
 //Variables
 float currentSpeed;
@@ -79,33 +77,6 @@ void setup()
     }
     frontSensor.startContinuous(100);
     bluetooth.begin("Group 2 SmartCar");
-    /*//----------------------- wifi setup 
-    WiFi.mode(WIFI_STA);
-    WiFi.begin(ssid, password);
-    Serial.println("");
-
-    // Wait for connection
-    while (WiFi.status() != WL_CONNECTED)
-    {
-        delay(500);
-        Serial.print(".");
-    }
-    Serial.println("");
-    Serial.print("Connected to ");
-    Serial.println(ssid);
-    Serial.print("IP address: ");
-    Serial.println(WiFi.localIP());
-
-    if (MDNS.begin("smartcar"))
-    {
-        Serial.println("MDNS responder started");
-    }
-
-    server.onNotFound(
-        []() { server.send(404, "text/plain", "Unknown command"); });
-
-    server.begin();
-    Serial.println("HTTP server started");*/
 }
 
 //Rotate on spot function for the automaticDriving
@@ -408,6 +379,5 @@ void writeBluetooth(byte message)
 void loop()
 {
     readBluetooth();
-    //server.handleClient();
     car.update();
 }
