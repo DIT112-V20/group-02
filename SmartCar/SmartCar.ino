@@ -83,10 +83,14 @@ void setup()
 // Bluetooth inputs
 void readBluetooth()
 {
-    while (bluetooth.available())
+    if (bluetooth.available())
     {
         char input = bluetooth.read();
+        
+        if (input != NULL)
+        { // Skip if no user input
         manualControl(input); // Sends input to  the manualcontrol to control the car
+        }
     }
 }
 
@@ -279,17 +283,20 @@ void checkRightObstacle()
 // Automated driving with obstacle avoidance
 void automatedDriving()
 {
-    while (autoDrivingEnabled)
+    checkFrontObstacle();
+    // Drive forward until there is an obstacle in front of car
+    while (!atObstacleFront && autoDrivingEnabled)
     {
+        readBluetooth();
+        driveForward();
+        writeBluetooth('f');
         checkFrontObstacle();
-        // Drive forward until there is an obstacle in front of car
-        while (!atObstacleFront)
-        {
-            driveForward();
-            writeBluetooth('f');
-            checkFrontObstacle();
-        }
+    }
+    if (autoDrivingEnabled)
+    { // Skip if user cancels auto mode
         stopCar();
+        writeBluetooth('s');
+
         checkLeftObstacle();
         checkRightObstacle();
 
@@ -297,6 +304,7 @@ void automatedDriving()
     }
 }
 
+// Recursively avoids obstacles
 void avoidObstacle(int totalDistance, int turns)
 {
     /* Implementing the "Wall Follower" algorithm for maze solving.
@@ -307,62 +315,74 @@ void avoidObstacle(int totalDistance, int turns)
     float currentDistance = 0;
     float tempDistance;
 
-    // Always have the wall to the left of the car
-    while (!atObstacleFront && atObstacleLeft)
+    // Always keep the wall on the left side of the car
+    while (!atObstacleFront && atObstacleLeft && autoDrivingEnabled)
     {
         if (abs(currentDistance) < 0.1 && turns % 4 == ORIENTATION_LEFT)
-        { // If we are driving back left and get close to distance needed, exit method
+        { // If we are driving back left and get close to the starting line, exit obstacle avoidance
+            stopCar();
+            writeBluetooth('s');
             rotateOnSpot(RIGHT);
             writeBluetooth('r');
             return;
         }
         tempDistance = car.getDistance();
+
         driveForward();
         writeBluetooth('f');
         checkFrontObstacle();
         checkLeftObstacle();
+
         currentDistance += calculateDistance(tempDistance, turns);
     }
-    stopCar();
-    totalDistance += currentDistance;
-
-    checkRightObstacle();
-
-    if (!atObstacleLeft)
-    { // If left is clear, rotate and iterate obstacle avoidance again
-        rotateOnSpot(LEFT);
-        writeBluetooth('l');
-        avoidObstacle(totalDistance, turns - 1);
-    }
-    else if (!atObstacleRight)
-    { // If right is clear, rotate and iterate obstacle avoidance again
-        rotateOnSpot(RIGHT);
-        writeBluetooth('r');
-        avoidObstacle(totalDistance, turns + 1);
-    }
-    else if (atObstacleFront)
-    { // If all sides and front is hindered, drive backwards
-        tempDistance = car.getDistance();
-
-        while (atObstacleRight)
-        {
-            driveBackward();
-            writeBluetooth('b');
-            checkRightObstacle();
-        }
+    if (autoDrivingEnabled)
+    { // Skip if user cancels auto mode
         stopCar();
-        totalDistance -= calculateDistance(tempDistance, turns);
+        writeBluetooth('s');
+        totalDistance += currentDistance;
 
-        rotateOnSpot(RIGHT);
-        writeBluetooth('r');
-        avoidObstacle(totalDistance, turns + 1);
+        checkRightObstacle();
+        // Priority of car movmement behaviour: left > right > backwards
+        if (!atObstacleLeft)
+        { // If left side is clear, rotate left and iterate through obstacle avoidance again
+            rotateOnSpot(LEFT);
+            writeBluetooth('l');
+            avoidObstacle(totalDistance, turns - 1);
+        }
+        else if (!atObstacleRight)
+        { // If right side is clear, rotate right and iterate through obstacle avoidance again
+            rotateOnSpot(RIGHT);
+            writeBluetooth('r');
+            avoidObstacle(totalDistance, turns + 1);
+        }
+        else if (atObstacleFront)
+        { // If all sides and front is aren't clear, drive backwards until right side gets cleared
+            tempDistance = car.getDistance();
+
+            while (atObstacleRight && autoDrivingEnabled)
+            {
+                driveBackward();
+                writeBluetooth('b');
+                checkRightObstacle();
+            }
+            if (autoDrivingEnabled)
+            { // Skip if user cancels auto mode
+                stopCar();
+                writeBluetooth('s');
+                totalDistance -= calculateDistance(tempDistance, turns);
+
+                rotateOnSpot(RIGHT);
+                writeBluetooth('r');
+                avoidObstacle(totalDistance, turns + 1);
+            }
+        }
     }
 }
 
 float calculateDistance(float tempDistance, int turns)
 {
-    // Returns the distance travelled along the x axis. Positive if the car is travelling East
-    // Negative if the car is travelling to the west
+    // Returns the distance travelled along the x axis (vertically of car).
+    // Positive if the car is travelling right, negative if the car is travelling to the west
     float currentDistance;
     // Calculate the distance traversed in this iteration
     if (turns % 4 == ORIENTATION_RIGHT)
@@ -389,7 +409,7 @@ void manualControl(char input)
 
     case 'm': // Manual
         autoDrivingEnabled = false;
-        driveForward();
+        stopCar();
         break;
 
     case 'f': // Forward
