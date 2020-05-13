@@ -9,7 +9,7 @@
     <TextView
         android:id="@+id/textView3"
         android:layout_width="333dp"
-        android:layout_height="48dp"
+        android:layout_height="43dp"
         android:clickable="false"
         android:fontFamily="@font/segoebold"
         android:text="@string/control_the_car"
@@ -17,10 +17,10 @@
         android:textSize="30sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.82"
+        app:layout_constraintHorizontal_bias="0.782"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.021"
+        app:layout_constraintVertical_bias="0.015"
         tools:ignore="MissingConstraints" />
 
     <ToggleButton
@@ -44,64 +44,64 @@
     <Button
         android:id="@+id/buttonBackward"
         style="?android:attr/borderlessButtonStyle"
-        android:layout_width="96dp"
-        android:layout_height="88dp"
-        android:background="@drawable/ic_arrow_downward_24px"
+        android:layout_width="83dp"
+        android:layout_height="82dp"
+        android:background="@drawable/ic_downwards_arrow"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.612" />
+        app:layout_constraintVertical_bias="0.604" />
 
     <Button
         android:id="@+id/buttonForward"
         style="?android:attr/borderlessButtonStyle"
-        android:layout_width="96dp"
-        android:layout_height="88dp"
-        android:background="@drawable/ic_arrow_upward_24px"
+        android:layout_width="83dp"
+        android:layout_height="82dp"
+        android:background="@drawable/ic_upwards_arrow"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.339" />
+        app:layout_constraintVertical_bias="0.317" />
 
     <Button
         android:id="@+id/buttonLeft"
         style="?android:attr/borderlessButtonStyle"
-        android:layout_width="96dp"
-        android:layout_height="88dp"
-        android:background="@drawable/ic_arrow_back_24px"
+        android:layout_width="83dp"
+        android:layout_height="82dp"
+        android:background="@drawable/ic_left_arrow"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.193"
+        app:layout_constraintHorizontal_bias="0.21"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.475" />
+        app:layout_constraintVertical_bias="0.462" />
 
     <Button
         android:id="@+id/buttonRight"
         style="?android:attr/borderlessButtonStyle"
-        android:layout_width="96dp"
-        android:layout_height="88dp"
-        android:background="@drawable/ic_arrow_forward_24px"
+        android:layout_width="83dp"
+        android:layout_height="82dp"
+        android:background="@drawable/ic_right_arrow"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.803"
+        app:layout_constraintHorizontal_bias="0.789"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.475" />
+        app:layout_constraintVertical_bias="0.465" />
 
     <Button
         android:id="@+id/buttonExit"
         style="?android:attr/borderlessButtonStyle"
-        android:layout_width="48dp"
-        android:layout_height="47dp"
-        android:background="@drawable/ic_arrow_back_24px"
+        android:layout_width="24dp"
+        android:layout_height="38dp"
+        android:background="@drawable/ic_return"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.019"
+        app:layout_constraintHorizontal_bias="0.041"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.023" />
@@ -118,6 +118,32 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.956" />
+
+    <Button
+        android:id="@+id/buttonAccelerate"
+        style="?android:attr/borderlessButtonStyle"
+        android:layout_width="63dp"
+        android:layout_height="56dp"
+        android:background="@drawable/ic_acellerate"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.916"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.714" />
+
+    <Button
+        android:id="@+id/button_decrease_speed"
+        style="?android:attr/borderlessButtonStyle"
+        android:layout_width="56dp"
+        android:layout_height="57dp"
+        android:background="@drawable/ic_decrease_speed"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.07"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.715" />
 
     <TextView
         android:id="@+id/textView2"
