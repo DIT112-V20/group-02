@@ -26,6 +26,8 @@ class ConnectActivity : AppCompatActivity() {
         var m_address: String? = null
     }
 
+
+
     override fun onCreate(savedInstanceState: Bundle?){
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_connect)
@@ -40,6 +42,8 @@ class ConnectActivity : AppCompatActivity() {
             toast("Not connected to car")
         }
 
+
+
         buttonForward.setOnClickListener { sendMessage("f") }
         buttonBackward.setOnClickListener { sendMessage("b") }
         buttonLeft.setOnClickListener { sendMessage("l") }
@@ -48,7 +52,18 @@ class ConnectActivity : AppCompatActivity() {
         buttonExit.setOnClickListener { disconnect() }
         toggleDriveMode.setOnClickListener{
             if (toggleDriveMode.isChecked) {
-                toast("Automatic driving is WIP.")
+                var automaticDriving = false;
+                if(!automaticDriving) {
+                    sendMessage("a")
+                    automaticDriving = true
+                    toast("Automatic driving is active.")
+                } else {
+                    sendMessage("m")
+                    automaticDriving = false
+                    toast("Manual driving is active.")
+
+
+                }
             }
         }
     }
@@ -61,6 +76,18 @@ class ConnectActivity : AppCompatActivity() {
                 Log.e(TAG, "Error writing message")
             }
         }
+    }
+
+    private fun readMessage(): Char {
+        var input: Char = 'q'
+        if (m_bluetoothSocket != null) {
+            try {
+                input = m_bluetoothSocket!!.inputStream.read().toChar()
+            } catch (e: IOException) {
+                Log.e(TAG, "Error reading message")
+            }
+        }
+        return input;
     }
 
     private fun disconnect() {
