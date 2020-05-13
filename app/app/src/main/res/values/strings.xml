@@ -19,5 +19,7 @@
     <string name="backward">Backward</string>
     <string name="left">Left</string>
     <string name="right">Right</string>
+
+    <string name="tutorial">Tutorial Image</string>
     
 </resources>
