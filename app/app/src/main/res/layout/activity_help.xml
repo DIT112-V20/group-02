@@ -8,14 +8,14 @@
 
 
     <ScrollView
-        android:layout_width="366dp"
-        android:layout_height="602dp"
+        android:id="@+id/scrollView2"
+        android:layout_width="369dp"
+        android:layout_height="600dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.488"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.751">
+        app:layout_constraintVertical_bias="0.778">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -24,24 +24,88 @@
 
             <ImageView
                 android:layout_width="match_parent"
-                android:layout_height="250dp"
-                android:background="#c1c1c1"
+                android:layout_height="match_parent"
+                android:background="@android:color/transparent"
                 android:contentDescription="@string/tutorial"
-                android:src="@drawable/button_help" />
+                android:padding="10dp"
+                android:src="@drawable/toggle_bluetooth" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="81dp"
+                android:fontFamily="@font/segoeui"
+                android:paddingHorizontal="4dp"
+                android:text="@string/toggle_bluetooth_tutorial"
+                android:textAlignment="center"
+                android:textSize="18sp" />
 
             <ImageView
                 android:layout_width="match_parent"
-                android:layout_height="250dp"
-                android:layout_marginTop="30dp"
-                android:background="#c1c1c1"
-                android:contentDescription="@string/tutorial" />
+                android:layout_height="match_parent"
+                android:background="@android:color/transparent"
+                android:contentDescription="@string/tutorial"
+                android:padding="10dp"
+                android:src="@drawable/control_car_tutorial_image" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="81dp"
+                android:fontFamily="@font/segoeui"
+                android:paddingHorizontal="4dp"
+                android:text="@string/control_car_tutorial"
+                android:textAlignment="center"
+                android:textSize="18sp" />
 
             <ImageView
                 android:layout_width="match_parent"
-                android:layout_height="250dp"
-                android:layout_marginTop="30dp"
-                android:background="#c1c1c1"
-                android:contentDescription="@string/tutorial" />
+                android:layout_height="match_parent"
+                android:background="@android:color/transparent"
+                android:contentDescription="@string/tutorial"
+                android:padding="10dp"
+                android:src="@drawable/car_control_manual" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="179dp"
+                android:fontFamily="@font/segoeui"
+                android:paddingHorizontal="4dp"
+                android:text="@string/manual_control_tutorial"
+                android:textAlignment="center"
+                android:textSize="18sp" />
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@android:color/transparent"
+                android:contentDescription="@string/tutorial"
+                android:padding="10dp"
+                android:src="@drawable/stop_button_picture" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="61dp"
+                android:fontFamily="@font/segoeui"
+                android:paddingHorizontal="4dp"
+                android:text="@string/stop_car_tutorial"
+                android:textAlignment="center"
+                android:textSize="18sp" />
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@android:color/transparent"
+                android:contentDescription="@string/tutorial"
+                android:padding="10dp"
+                android:src="@drawable/drive_mode_button" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="104dp"
+                android:fontFamily="@font/segoeui"
+                android:paddingHorizontal="4dp"
+                android:text="@string/change_mode_tutorial"
+                android:textAlignment="center"
+                android:textSize="18sp" />
 
         </LinearLayout>
     </ScrollView>
@@ -55,6 +119,21 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.044"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.038" />
+
+    <TextView
+        android:id="@+id/textView5"
+        android:layout_width="264dp"
+        android:layout_height="50dp"
+        android:fontFamily="@font/segoebold"
+        android:text="@string/help_tutorial"
+        android:textColor="#FFFFFF"
+        android:textSize="30sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.038" />

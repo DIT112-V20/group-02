@@ -1,4 +1,6 @@
 <resources>
+
+    <!-- These are for the main activity. -->
     <string name="app_name">SmartCar</string>
     <string name="drive_car">Control car</string>
     <string name="smartcar_app">SmartCar App</string>
@@ -12,6 +14,7 @@
     <string name="logo">logo </string>
     <string name="description">An automatic and manually driven Arduino car.</string>
 
+    <!-- These are for the connect activity. -->
     <string name="manual">Manual</string>
     <string name="automatic">Automatic</string>
     <string name="stop">STOP</string>
@@ -20,6 +23,32 @@
     <string name="left">Left</string>
     <string name="right">Right</string>
 
+    <!-- These are for the help activity. -->
+    <string name="help_tutorial">Help</string>
     <string name="tutorial">Tutorial Image</string>
+
+    <string name="toggle_bluetooth_tutorial">
+        Begin by toggling bluetooth on by clicking the toggle bluetooth switch,
+        unless bluetooth is already activated on your phone. </string>
+
+    <string name="control_car_tutorial">
+        After you have toggled bluetooth on, simply click the Control Car button
+        located above the toggle bluetooth switch to start driving! </string>
+
+    <string name="manual_control_tutorial">
+        To control the car manually, click any of the buttons to choose which way the car goes. \n
+        Your options are: \n
+        - Forward \n
+        - Left \n
+        - Right \n
+        - Backwards
+        </string>
+
+    <string name="stop_car_tutorial">
+        Pressing the stop button will stop the car when you are driving manually. </string>
+
+    <string name="change_mode_tutorial">
+        Pressing the Manual button will put the car in automatic driving mode.
+        You will not be able to press the manual driving buttons in this mode. </string>
     
 </resources>
