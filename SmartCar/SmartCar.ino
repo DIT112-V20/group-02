@@ -60,7 +60,7 @@ SmartCar car(control, gyro, leftOdometer, rightOdometer);
 
 void setup()
 {
-    car.enableCruiseControl(); //Enables Cruisecontrol in order to work with m/s
+    car.enableCruiseControl(); // Enables Cruisecontrol in order to work with m/s
     Serial.begin(9600);
     Wire.begin();
     frontSensor.setTimeout(500);
@@ -75,10 +75,10 @@ void setup()
     bluetooth.begin("Group 2 SmartCar");
 }
 
-//Rotate on spot function for the automaticDriving
+// Rotate on spot function for the automaticDriving
 void rotateOnSpot(int targetDegrees)
 {
-    car.disableCruiseControl(); //Disables cruiseControl in order to use OverrideMotorSpeed
+    car.disableCruiseControl(); // Disables cruiseControl in order to use OverrideMotorSpeed
     int speed = 40;
     targetDegrees %= 360; // Puts it on a (-360,360) scale
 
@@ -87,7 +87,7 @@ void rotateOnSpot(int targetDegrees)
         return;
     }
 
-    //Sets overrideMotorSpeed values depending on targetDegrees
+    // Sets overrideMotorSpeed values depending on targetDegrees
     if (targetDegrees > 0)
     {
         car.overrideMotorSpeed(speed, -speed);
@@ -119,19 +119,17 @@ void rotateOnSpot(int targetDegrees)
         degreesTurnedSoFar = initialHeading - currentHeading;
     }
     car.setSpeed(0);
-    car.enableCruiseControl(); //ReEnable cruiseControl
+    car.enableCruiseControl(); // ReEnable cruiseControl
 }
 
 // Car rotate for manualControl
 void rotate(int degrees, float speed)
 {
-
     degrees %= 360; // Put degrees in a (-360,360) scale
-
     car.setSpeed(speed);
-    //Checks if we are driving backward or forward and sets angle accordingly
+    
     if (speed < 0)
-    {
+    { // Checks if we are driving backward or forward and sets angle accordingly
         if (degrees > 0)
         {
             car.setAngle(LEFT);
@@ -152,21 +150,18 @@ void rotate(int degrees, float speed)
             car.setAngle(LEFT);
         }
     }
-
     const auto initialHeading = car.getHeading();
     bool hasReachedTargetDegrees = false;
     while (!hasReachedTargetDegrees)
-    {
+    { // While car hasn't turned enough
         car.update();
         auto currentHeading = car.getHeading();
         if (degrees < 0 && currentHeading > initialHeading)
-        {
-            // Turning while current heading is bigger than the initial one
+        { // Turning while current heading is bigger than the initial one
             currentHeading -= 360;
         }
         else if (degrees > 0 && currentHeading < initialHeading)
-        {
-            // Turning while current heading is smaller than the initial one
+        { // Turning while current heading is smaller than the initial one
             currentHeading += 360;
         }
 
@@ -232,7 +227,7 @@ void driveDistance(long distance, float speed)
     stopCar();
 }
 
-// Obstacle interference
+// Obstacle interference forward
 void checkFrontObstacle()
 {
     frontDistance = (frontSensor.readRangeSingleMillimeters() - frontSensorError);
@@ -243,18 +238,21 @@ void checkFrontObstacle()
     atObstacleFront = (frontDistance > 0 && frontDistance <= FRONT_MIN_OBSTACLE) ? true : false;
 }
 
+// Obstacle interference left
 void checkLeftObstacle()
 {
     leftDistance = leftSensor.getDistance();
     atObstacleLeft = (leftDistance > 0 && leftDistance <= SIDE_MIN_OBSTACLE) ? true : false;
 }
 
+// Obstacle interference right
 void checkRightObstacle()
 {
     rightDistance = rightSensor.getDistance();
     atObstacleRight = (rightDistance > 0 && rightDistance <= SIDE_MIN_OBSTACLE) ? true : false;
 }
 
+// Automated driving with obstacle avoidance
 void automatedDriving()
 {
     while (autoDrivingEnabled)
@@ -264,6 +262,7 @@ void automatedDriving()
         //Drive forward until there is an obstacle infron of car.
         while (!atObstacleFront)
         {
+            readBluetooth();
             driveForward();
             writeBluetooth('f');
             checkFrontObstacle();
@@ -273,42 +272,43 @@ void automatedDriving()
         checkLeftObstacle();
         checkRightObstacle();
         if (atObstacleLeft && !atObstacleRight)
-        {
+        { // If obstacle at left but not right, turn right.
             rotateOnSpot(RIGHT);
             writeBluetooth('r');
-        } // If obstacle at left but not right, turn right.
+        }
         if (!atObstacleLeft && atObstacleRight)
-        {
+        { // If obstacle at right but not left, turn left.
             rotateOnSpot(LEFT);
             writeBluetooth('l');
-        } // If obstacle at right but not left, turn left.
+        }
         if (!atObstacleRight && !atObstacleLeft)
-        {
+        { // If both sides are clear, turn right.
             rotateOnSpot(RIGHT);
             writeBluetooth('r');
-        } // If both sides are clear, turn right.
-        // if (atObstacleRight && atObstacleLeft)
-        // {
-        //     while (atObstacleRight && atObstacleLeft)
-        //     { 
-        //         driveBackward();
-        //         writeBluetooth('b');
-        //         checkLeftObstacle();
-        //         checkRightObstacle();
-        //     } // While obstacle is at right and left
-        //     if (atObstacleLeft)
-        //     {
-        //         rotateOnSpot(RIGHT);
-        //         writeBluetooth('r');
-        //     } // If obstacle at left, turn right.
-        //     else if (atObstacleRight)
-        //     {
-        //         rotateOnSpot(LEFT);
-        //         writeBluetooth('l');
-        //     } // If obstacle at right, turn left.
-        // }
+        }
+        if (atObstacleRight && atObstacleLeft)
+        { // If obstacle is at right and left
+            while (atObstacleRight && atObstacleLeft)
+            { // While obstacle is at right and left, drive backwards
+                readBluetooth();
+                driveBackward();
+                writeBluetooth('b');
+                checkLeftObstacle();
+                checkRightObstacle();
+            }
+            if (atObstacleLeft)
+            { // If obstacle at left, turn right
+                rotateOnSpot(RIGHT);
+                writeBluetooth('r');
+            }
+            else if (atObstacleRight)
+            { // If obstacle at right, turn left
+                rotateOnSpot(LEFT);
+                writeBluetooth('l');
+            }
+        }
         //TODO: Need to refine the driving. At the moment the car just drives forward as standard. We want the car to avoid the obstacle and
-        // then resume the original path. We also need a way to break out of automatic driving(?).
+        // then resume the original heading.
     }
 }
 
@@ -318,13 +318,16 @@ void manualControl(char input)
     switch (input)
     {
 
-    case 'a': // Auto
-        autoDrivingEnabled = true;
+    case 'a': // Auto switch
+        if (!autoDrivingEnabled)
+        {
+            autoDrivingEnabled = true;
+        }
+        else
+        {
+            autoDrivingEnabled = false;
+        }
         automatedDriving();
-        break;
-
-    case 'm': // Manual
-        autoDrivingEnabled = false;
         break;
 
     case 'f': // Forward
@@ -374,6 +377,7 @@ void readBluetooth()
     }
 }
 
+// Bluetooth outputs
 void writeBluetooth(byte message)
 {
     if (bluetooth.hasClient())
