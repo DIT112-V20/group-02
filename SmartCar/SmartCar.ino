@@ -289,6 +289,7 @@ void automatedDriving()
             writeBluetooth('f');
             checkFrontObstacle();
         }
+        stopCar();
         checkLeftObstacle();
         checkRightObstacle();
 
@@ -322,6 +323,7 @@ void avoidObstacle(int totalDistance, int turns)
         checkLeftObstacle();
         currentDistance += calculateDistance(tempDistance, turns);
     }
+    stopCar();
     totalDistance += currentDistance;
 
     checkRightObstacle();
@@ -348,6 +350,7 @@ void avoidObstacle(int totalDistance, int turns)
             writeBluetooth('b');
             checkRightObstacle();
         }
+        stopCar();
         totalDistance -= calculateDistance(tempDistance, turns);
 
         rotateOnSpot(RIGHT);
