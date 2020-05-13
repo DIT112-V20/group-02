@@ -82,7 +82,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun helpButton(){
-        val intent = Intent(this, ConnectActivity::class.java)
+        val intent = Intent(this, HelpActivity::class.java)
         startActivity(intent)
     }
 
