@@ -4,6 +4,7 @@ import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothSocket
 import android.content.Context
+import android.media.MediaPlayer
 import android.os.AsyncTask
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -12,6 +13,8 @@ import kotlinx.android.synthetic.main.activity_connect.*
 import org.jetbrains.anko.toast
 import java.io.IOException
 import java.util.*
+import android.app.Activity
+
 
 private const val TAG = "Group 2 - Debug:"
 
@@ -26,7 +29,7 @@ class ConnectActivity : AppCompatActivity() {
         var m_address: String? = null
     }
 
-
+    var automaticDriving: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?){
         super.onCreate(savedInstanceState)
@@ -42,31 +45,43 @@ class ConnectActivity : AppCompatActivity() {
             toast("Not connected to car")
         }
 
+        buttonForward.setOnClickListener { sendMessage("f")
+            var drivingForward = MediaPlayer.create(this, R.raw.driving_forward)
+            drivingForward!!.start()}
+        buttonBackward.setOnClickListener { sendMessage("b")
+            var drivingBackwards = MediaPlayer.create(this, R.raw.driving_backwards)
+            drivingBackwards!!.start()
+        }
+        buttonLeft.setOnClickListener { sendMessage("l")
+            var turningLeft = MediaPlayer.create(this, R.raw.turning_left)
+            turningLeft!!.start()
+        }
+        buttonRight.setOnClickListener { sendMessage("r")
+            var turningRight = MediaPlayer.create(this, R.raw.turning_right)
+            turningRight!!.start()
+        }
 
-
-        buttonForward.setOnClickListener { sendMessage("f") }
-        buttonBackward.setOnClickListener { sendMessage("b") }
-        buttonLeft.setOnClickListener { sendMessage("l") }
-        buttonRight.setOnClickListener { sendMessage("r") }
-        buttonStop.setOnClickListener { sendMessage("§") }
+        buttonStop.setOnClickListener { sendMessage("§")                                        }
         buttonExit.setOnClickListener { disconnect() }
 
         toggleDriveMode.setOnClickListener{
 
             if (toggleDriveMode.isChecked) {
-                var automaticDriving = false;
-                if(!automaticDriving) {
                     sendMessage("a")
                     automaticDriving = true
                     toast("Automatic driving is active.")
-                } else {
+            } else {
                     sendMessage("m")
                     automaticDriving = false
                     toast("Manual driving is active.")
-
-
                 }
             }
+
+
+        while(m_isConnected){
+            var input = readMessage()
+
+
         }
     }
 
