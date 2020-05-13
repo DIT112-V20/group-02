@@ -91,12 +91,12 @@
                 android:textSize="18sp" />
 
             <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@android:color/transparent"
-                android:contentDescription="@string/tutorial"
-                android:padding="10dp"
-                android:src="@drawable/drive_mode_button" />
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/transparent"
+            android:contentDescription="@string/tutorial"
+            android:padding="10dp"
+            android:src="@drawable/drive_mode_button" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -104,6 +104,23 @@
                 android:fontFamily="@font/segoeui"
                 android:paddingHorizontal="4dp"
                 android:text="@string/change_mode_tutorial"
+                android:textAlignment="center"
+                android:textSize="18sp" />
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@android:color/transparent"
+                android:contentDescription="@string/tutorial"
+                android:padding="10dp"
+                android:src="@drawable/decrease_and_increase_speed" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="133dp"
+                android:fontFamily="@font/segoeui"
+                android:paddingHorizontal="4dp"
+                android:text="@string/change_speed_tutorial"
                 android:textAlignment="center"
                 android:textSize="18sp" />
 

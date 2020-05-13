@@ -50,5 +50,10 @@
     <string name="change_mode_tutorial">
         Pressing the Manual button will put the car in automatic driving mode.
         You will not be able to press the manual driving buttons in this mode. </string>
+
+    <string name="change_speed_tutorial">
+        Pressing either the plus or minus buttons on the screen will allow you to increase or
+        decrease the speed of the car. The minus decreases the speed, and the plus
+        increases the speed. </string>
     
 </resources>
