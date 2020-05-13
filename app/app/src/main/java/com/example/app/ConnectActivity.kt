@@ -45,22 +45,10 @@ class ConnectActivity : AppCompatActivity() {
             toast("Not connected to car")
         }
 
-        buttonForward.setOnClickListener { sendMessage("f")
-            var drivingForward = MediaPlayer.create(this, R.raw.driving_forward)
-            drivingForward!!.start()}
-        buttonBackward.setOnClickListener { sendMessage("b")
-            var drivingBackwards = MediaPlayer.create(this, R.raw.driving_backwards)
-            drivingBackwards!!.start()
-        }
-        buttonLeft.setOnClickListener { sendMessage("l")
-            var turningLeft = MediaPlayer.create(this, R.raw.turning_left)
-            turningLeft!!.start()
-        }
-        buttonRight.setOnClickListener { sendMessage("r")
-            var turningRight = MediaPlayer.create(this, R.raw.turning_right)
-            turningRight!!.start()
-        }
-
+        buttonForward.setOnClickListener { sendMessage("f") }
+        buttonBackward.setOnClickListener { sendMessage("b") }
+        buttonLeft.setOnClickListener { sendMessage("l") }
+        buttonRight.setOnClickListener { sendMessage("r") }
         buttonStop.setOnClickListener { sendMessage("§")                                        }
         buttonExit.setOnClickListener { disconnect() }
 
@@ -80,8 +68,7 @@ class ConnectActivity : AppCompatActivity() {
 
         while(m_isConnected){
             var input = readMessage()
-
-
+            playSound(input)
         }
     }
 
@@ -118,6 +105,27 @@ class ConnectActivity : AppCompatActivity() {
             }
         }
         finish()
+    }
+
+    private fun playSound(input: Char){
+        if(input == 'f'){
+            var drivingForward = MediaPlayer.create(this, R.raw.driving_forward)
+            drivingForward!!.start()
+        } else if (input == 's'){
+            var carStopped = MediaPlayer.create(this, R.raw.car_stopped)
+            carStopped!!.start()
+        } else if (input == 'r'){
+            var turningRight = MediaPlayer.create(this, R.raw.turning_right)
+            turningRight!!.start()
+        } else if (input == 'l'){
+            var turningLeft = MediaPlayer.create(this, R.raw.turning_left)
+            turningLeft!!.start()
+        } else if (input == 'b'){
+            var drivingBackwards = MediaPlayer.create(this, R.raw.driving_backwards)
+            drivingBackwards!!.start()
+        } else {
+            return;
+        }
     }
 
     //Class in charge of connecting the device with the car
