@@ -14,8 +14,13 @@ const int FRONT_MIN_OBSTACLE = 150; // Minimum distance for Micro-LIDAR
 const int GYROSCOPE_OFFSET = 13;
 const unsigned int MAX_DISTANCE = 100; // Max distance to measure with ultrasonic
 const float SPEEDCHANGE = 0.1;         // Used when increasing and decreasing speed. Might need a new more concrete name?
+// Autodrive direction variables
+const int ORIENTATION_FORWARD = 0;
+const int ORIENTATION_RIGHT = 1;
+const int ORIENTATION_BACK = 2;
+const int ORIENTATION_LEFT = 3;
 
-//Variables
+// Variables
 float currentSpeed;
 
 // Unsigned
@@ -75,6 +80,25 @@ void setup()
     bluetooth.begin("Group 2 SmartCar");
 }
 
+// Bluetooth inputs
+void readBluetooth()
+{
+    while (bluetooth.available())
+    {
+        char input = bluetooth.read();
+        manualControl(input); // Sends input to  the manualcontrol to control the car
+    }
+}
+
+// Bluetooth outputs
+void writeBluetooth(byte message)
+{
+    if (bluetooth.hasClient())
+    {
+        bluetooth.write(&message, 1);
+    }
+}
+
 // Rotate on spot function for the automaticDriving
 void rotateOnSpot(int targetDegrees)
 {
@@ -127,7 +151,7 @@ void rotate(int degrees, float speed)
 {
     degrees %= 360; // Put degrees in a (-360,360) scale
     car.setSpeed(speed);
-    
+
     if (speed < 0)
     { // Checks if we are driving backward or forward and sets angle accordingly
         if (degrees > 0)
@@ -257,59 +281,96 @@ void automatedDriving()
 {
     while (autoDrivingEnabled)
     {
-        readBluetooth();
         checkFrontObstacle();
-        //Drive forward until there is an obstacle infron of car.
+        // Drive forward until there is an obstacle in front of car
         while (!atObstacleFront)
         {
-            readBluetooth();
             driveForward();
             writeBluetooth('f');
             checkFrontObstacle();
         }
-        stopCar();
-        writeBluetooth('s');
         checkLeftObstacle();
         checkRightObstacle();
-        if (atObstacleLeft && !atObstacleRight)
-        { // If obstacle at left but not right, turn right.
-            rotateOnSpot(RIGHT);
-            writeBluetooth('r');
-        }
-        if (!atObstacleLeft && atObstacleRight)
-        { // If obstacle at right but not left, turn left.
-            rotateOnSpot(LEFT);
-            writeBluetooth('l');
-        }
-        if (!atObstacleRight && !atObstacleLeft)
-        { // If both sides are clear, turn right.
-            rotateOnSpot(RIGHT);
-            writeBluetooth('r');
-        }
-        if (atObstacleRight && atObstacleLeft)
-        { // If obstacle is at right and left
-            while (atObstacleRight && atObstacleLeft)
-            { // While obstacle is at right and left, drive backwards
-                readBluetooth();
-                driveBackward();
-                writeBluetooth('b');
-                checkLeftObstacle();
-                checkRightObstacle();
-            }
-            if (atObstacleLeft)
-            { // If obstacle at left, turn right
-                rotateOnSpot(RIGHT);
-                writeBluetooth('r');
-            }
-            else if (atObstacleRight)
-            { // If obstacle at right, turn left
-                rotateOnSpot(LEFT);
-                writeBluetooth('l');
-            }
-        }
-        //TODO: Need to refine the driving. At the moment the car just drives forward as standard. We want the car to avoid the obstacle and
-        // then resume the original heading.
+
+        avoidObstacle(0, ORIENTATION_RIGHT); // Initialise obstacle avoidance
     }
+}
+
+void avoidObstacle(int totalDistance, int turns)
+{
+    /* Implementing the "Wall Follower" algorithm for maze solving.
+       Always have the obstacle to the left of the car. If we return to the
+       straight line the car was on before encountering the obstacle, we are clear
+        of the obstacle. */
+
+    float currentDistance = 0;
+    float tempDistance;
+
+    // Always have the wall to the left of the car
+    while (!atObstacleFront && atObstacleLeft)
+    {
+        if (abs(currentDistance) < 0.1 && turns % 4 == ORIENTATION_LEFT)
+        { // If we are driving back left and get close to distance needed, exit method
+            rotateOnSpot(RIGHT);
+            writeBluetooth('r');
+            return;
+        }
+        tempDistance = car.getDistance();
+        driveForward();
+        writeBluetooth('f');
+        checkFrontObstacle();
+        checkLeftObstacle();
+        currentDistance += calculateDistance(tempDistance, turns);
+    }
+    totalDistance += currentDistance;
+
+    checkRightObstacle();
+
+    if (!atObstacleLeft)
+    { // If left is clear, rotate and iterate obstacle avoidance again
+        rotateOnSpot(LEFT);
+        writeBluetooth('l');
+        avoidObstacle(totalDistance, turns - 1);
+    }
+    else if (!atObstacleRight)
+    { // If right is clear, rotate and iterate obstacle avoidance again
+        rotateOnSpot(RIGHT);
+        writeBluetooth('r');
+        avoidObstacle(totalDistance, turns + 1);
+    }
+    else if (atObstacleFront)
+    { // If all sides and front is hindered, drive backwards
+        tempDistance = car.getDistance();
+
+        while (atObstacleRight)
+        {
+            driveBackward();
+            writeBluetooth('b');
+            checkRightObstacle();
+        }
+        totalDistance -= calculateDistance(tempDistance, turns);
+
+        rotateOnSpot(RIGHT);
+        writeBluetooth('r');
+        avoidObstacle(totalDistance, turns + 1);
+    }
+}
+
+float calculateDistance(float tempDistance, int turns)
+{
+    // Returns the distance travelled along the x axis. Positive if the car is travelling East
+    // Negative if the car is travelling to the west
+    float currentDistance;
+    // Calculate the distance traversed in this iteration
+    if (turns % 4 == ORIENTATION_RIGHT)
+    {
+        currentDistance = car.getDistance() - tempDistance;
+    }
+    else if (turns % 4 == ORIENTATION_LEFT)
+    {
+        currentDistance = -(car.getDistance() - tempDistance);
+    }
+    return currentDistance;
 }
 
 // Drive inputs
@@ -318,16 +379,14 @@ void manualControl(char input)
     switch (input)
     {
 
-    case 'a': // Auto switch
-        if (!autoDrivingEnabled)
-        {
-            autoDrivingEnabled = true;
-        }
-        else
-        {
-            autoDrivingEnabled = false;
-        }
+    case 'a': // Auto
+        autoDrivingEnabled = true;
         automatedDriving();
+        break;
+
+    case 'm': // Manual
+        autoDrivingEnabled = false;
+        driveForward();
         break;
 
     case 'f': // Forward
@@ -364,25 +423,6 @@ void manualControl(char input)
 
     default:
         stopCar();
-    }
-}
-
-// Bluetooth inputs
-void readBluetooth()
-{
-    while (bluetooth.available())
-    {
-        char input = bluetooth.read();
-        manualControl(input); // Sends input to  the manualcontrol to control the car
-    }
-}
-
-// Bluetooth outputs
-void writeBluetooth(byte message)
-{
-    if (bluetooth.hasClient())
-    {
-        bluetooth.write(&message, 1);
     }
 }
 
