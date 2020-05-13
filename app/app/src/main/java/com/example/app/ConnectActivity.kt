@@ -46,9 +46,18 @@ class ConnectActivity : AppCompatActivity() {
         buttonRight.setOnClickListener { sendMessage("r") }
         buttonStop.setOnClickListener { sendMessage("§") }
         buttonExit.setOnClickListener { disconnect() }
+
         toggleDriveMode.setOnClickListener{
+
             if (toggleDriveMode.isChecked) {
                 toast("Automatic driving is WIP.")
+
+                // Make buttons un-clickable in automatic driving mode.
+                buttonForward.isEnabled = false
+                buttonBackward.isEnabled = false
+                buttonLeft.isEnabled = false
+                buttonRight.isEnabled = false
+                buttonStop.isEnabled = false
             }
         }
     }
