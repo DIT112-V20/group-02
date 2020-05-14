@@ -15,7 +15,7 @@ import java.io.IOException
 import java.util.*
 
 
-private const val TAG = "Group 2 - Debug:"
+
 
 class ConnectActivity : AppCompatActivity() {
 
@@ -28,6 +28,7 @@ class ConnectActivity : AppCompatActivity() {
         var m_address: String? = null
     }
 
+    //private const val TAG = "Group 2 - Debug:"
     private var automaticDriving: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?){
@@ -79,7 +80,7 @@ class ConnectActivity : AppCompatActivity() {
             try {
                 m_bluetoothSocket!!.outputStream.write(message.toByteArray())
             } catch (e: IOException) {
-                Log.e(TAG, "Error writing message")
+                Log.e("data", "Error writing message")
             }
         }
     }
@@ -155,9 +156,11 @@ class ConnectActivity : AppCompatActivity() {
         override fun onPostExecute(result: String?) {
             super.onPostExecute(result)
             if(!connectSuccess){
-                Log.i(TAG, "could not connect")
+                Log.i("data", "could not connect")
             } else {
                 m_isConnected = true
+
+
             }
         }
     }
