@@ -13,7 +13,6 @@ import kotlinx.android.synthetic.main.activity_connect.*
 import org.jetbrains.anko.toast
 import java.io.IOException
 import java.util.*
-import android.app.Activity
 
 
 private const val TAG = "Group 2 - Debug:"
@@ -29,7 +28,7 @@ class ConnectActivity : AppCompatActivity() {
         var m_address: String? = null
     }
 
-    var automaticDriving: Boolean = false
+    private var automaticDriving: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?){
         super.onCreate(savedInstanceState)
@@ -38,7 +37,7 @@ class ConnectActivity : AppCompatActivity() {
         m_address = "FC:F5:C4:0F:87:62"
         // Run the ConnectToDevice method
         ConnectToDevice(this).execute()
-      
+
         if(m_isConnected){
             toast("Connected to car")
         } else {
@@ -62,13 +61,16 @@ class ConnectActivity : AppCompatActivity() {
                     sendMessage("m")
                     automaticDriving = false
                     toast("Manual driving is active.")
-                }
+                    }
             }
-
 
         while(m_isConnected){
             var input = readMessage()
-            playSound(input)
+            if (input != null) {
+                playSound(input)
+            } else {
+                toast("Input is null")
+            }
         }
     }
 
@@ -82,8 +84,8 @@ class ConnectActivity : AppCompatActivity() {
         }
     }
 
-    private fun readMessage(): Char {
-        var input: Char = 'q'
+    private fun readMessage(): Char? {
+        var input: Char? = null
         if (m_bluetoothSocket != null) {
             try {
                 input = m_bluetoothSocket!!.inputStream.read().toChar()
@@ -134,9 +136,6 @@ class ConnectActivity : AppCompatActivity() {
         private var connectSuccess: Boolean = true
         private val context: Context = c
 
-        override fun onPreExecute() {
-            super.onPreExecute()
-        }
         //Connect device to car
         override fun doInBackground(vararg params: Void?): String? {
             try {
@@ -158,7 +157,7 @@ class ConnectActivity : AppCompatActivity() {
             }
             return null
         }
-      
+
         override fun onPostExecute(result: String?) {
             super.onPostExecute(result)
             if(!connectSuccess){
