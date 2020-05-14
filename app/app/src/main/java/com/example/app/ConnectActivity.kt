@@ -65,7 +65,7 @@ class ConnectActivity : AppCompatActivity() {
         while(m_isConnected){
             var input = readMessage()
             if (input != null) {
-                playSound(input)
+                //playSound(input)
             } else {
                 toast("Input is null")
             }
@@ -82,17 +82,7 @@ class ConnectActivity : AppCompatActivity() {
         }
     }
 
-    private fun readMessage(): Char? {
-        var input: Char? = null
-        if (m_bluetoothSocket != null) {
-            try {
-                input = m_bluetoothSocket!!.inputStream.read().toChar()
-            } catch (e: IOException) {
-                Log.e(TAG, "Error reading message")
-            }
-        }
-        return input;
-    }
+    private fun readMessage(){}
 
     private fun disconnect() {
         if (m_bluetoothSocket != null) {
@@ -132,7 +122,11 @@ class ConnectActivity : AppCompatActivity() {
     private class ConnectToDevice(c: Context) : AsyncTask<Void, Void, String>(){
 
         private var connectSuccess: Boolean = true
-        private val context: Context = c
+        private val context: Context
+
+        init {
+            this.context = c
+        }
 
         //Connect device to car
         override fun doInBackground(vararg params: Void?): String? {
