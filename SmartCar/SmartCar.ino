@@ -328,40 +328,6 @@ void checkRightObstacle()
     atObstacleRight = (rightDistance > 0 && rightDistance <= SIDE_MIN_OBSTACLE) ? true : false;
 }
 
-// Automated driving with obstacle avoidance helper
-void automatedDriving()
-{
-    checkFrontObstacle();
-    while (!atObstacleFront && autoDrivingEnabled)
-    { // Drive forward until there is an obstacle in front
-        autoDriveForward();
-    }
-    if (autoDrivingEnabled)
-    { // Skip obstacle avoidance if canceled
-        while (atObstacleLeft && atObstacleRight && autoDrivingEnabled)
-        { // If car is blocked on all sides, drive backwards until car is clear of obstacles
-            autoDriveBackward();
-        }
-        autoStop();
-        if (atObstacleLeft && !atObstacleRight && autoDrivingEnabled)
-        { // If right side is clear, start obstacle avoidance on right side
-            autoTurnRight();
-            avoidObstacle(RIGHT_TURN, atObstacleLeft, atObstacleRight, LEFT_TURN, RIGHT_TURN, autoTurnLeft, autoTurnRight);
-        }
-        else if (!atObstacleLeft && atObstacleRight && autoDrivingEnabled)
-        { // If left side is clear, start obstacle avoidance on left side
-            autoTurnLeft();
-            avoidObstacle(LEFT_TURN, atObstacleRight, atObstacleLeft, RIGHT_TURN, LEFT_TURN, autoTurnRight, autoTurnLeft);
-        }
-        else
-        { // If car get stuck, send error and exit
-            writeBluetooth('e');
-            autoDrivingEnabled = false;
-            return;
-        }
-    }
-}
-
 // Recursively avoids obstacles
 void avoidObstacle(
     int orientation,
@@ -405,6 +371,40 @@ void avoidObstacle(
         writeBluetooth('e');
         autoDrivingEnabled = false;
         return;
+    }
+}
+
+// Automated driving with obstacle avoidance helper
+void automatedDriving()
+{
+    checkFrontObstacle();
+    while (!atObstacleFront && autoDrivingEnabled)
+    { // Drive forward until there is an obstacle in front
+        autoDriveForward();
+    }
+    if (autoDrivingEnabled)
+    { // Skip obstacle avoidance if canceled
+        while (atObstacleLeft && atObstacleRight && autoDrivingEnabled)
+        { // If car is blocked on all sides, drive backwards until car is clear of obstacles
+            autoDriveBackward();
+        }
+        autoStop();
+        if (atObstacleLeft && !atObstacleRight && autoDrivingEnabled)
+        { // If right side is clear, start obstacle avoidance on right side
+            autoTurnRight();
+            avoidObstacle(RIGHT_TURN, atObstacleLeft, atObstacleRight, LEFT_TURN, RIGHT_TURN, autoTurnLeft, autoTurnRight);
+        }
+        else if (!atObstacleLeft && atObstacleRight && autoDrivingEnabled)
+        { // If left side is clear, start obstacle avoidance on left side
+            autoTurnLeft();
+            avoidObstacle(LEFT_TURN, atObstacleRight, atObstacleLeft, RIGHT_TURN, LEFT_TURN, autoTurnRight, autoTurnLeft);
+        }
+        else
+        { // If car get stuck, send error and exit
+            writeBluetooth('e');
+            autoDrivingEnabled = false;
+            return;
+        }
     }
 }
 
