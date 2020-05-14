@@ -348,12 +348,16 @@ void avoidObstacle(float position, int turns)
     { // Skip if user cancels auto mode
         stopCar();
         writeBluetooth('s');
-
         // Priority of car movmement behaviour: left > right > backwards
         if (!atObstacleLeft)
         { // If left side is clear, rotate left and iterate through obstacle avoidance again
             rotateOnSpot(LEFT);
             writeBluetooth('l');
+
+            checkRightObstacle();
+            checkLeftObstacle();
+            checkFrontObstacle();
+
             while (!atObstacleLeft && !atObstacleFront && autoDrivingEnabled)
             { // Drives forward until obstacle appears ahead or to the left
                 forwardObstacleDrive(position, turns);
@@ -364,6 +368,11 @@ void avoidObstacle(float position, int turns)
         { // If right side is clear, rotate right and iterate through obstacle avoidance again
             rotateOnSpot(RIGHT);
             writeBluetooth('r');
+
+            checkRightObstacle();
+            checkLeftObstacle();
+            checkFrontObstacle();
+
             avoidObstacle(position, turns + 1);
         }
         else if (atObstacleFront)
@@ -385,6 +394,11 @@ void avoidObstacle(float position, int turns)
 
                 rotateOnSpot(RIGHT);
                 writeBluetooth('r');
+
+                checkRightObstacle();
+                checkLeftObstacle();
+                checkFrontObstacle();
+
                 while (!atObstacleLeft && !atObstacleFront && autoDrivingEnabled)
                 {
                     forwardObstacleDrive(position, turns);
