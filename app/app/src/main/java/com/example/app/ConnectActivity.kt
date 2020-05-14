@@ -4,10 +4,10 @@ import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothSocket
 import android.content.Context
-import android.os.AsyncTask
+import android.os.*
 import androidx.appcompat.app.AppCompatActivity
-import android.os.Bundle
 import android.util.Log
+import androidx.annotation.RequiresApi
 import kotlinx.android.synthetic.main.activity_connect.*
 import org.jetbrains.anko.toast
 import java.io.IOException
@@ -26,6 +26,8 @@ class ConnectActivity : AppCompatActivity() {
         var m_address: String? = null
     }
 
+    private var vibrator: Vibrator? = null
+
     override fun onCreate(savedInstanceState: Bundle?){
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_connect)
@@ -33,12 +35,14 @@ class ConnectActivity : AppCompatActivity() {
         m_address = "FC:F5:C4:0F:87:62"
         // Run the ConnectToDevice method
         ConnectToDevice(this).execute()
-      
+
         if(m_isConnected){
             toast("Connected to car")
         } else {
             toast("Not connected to car")
         }
+
+        vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
 
         buttonForward.setOnClickListener { sendMessage("f") }
         buttonBackward.setOnClickListener { sendMessage("b") }
@@ -49,6 +53,22 @@ class ConnectActivity : AppCompatActivity() {
         toggleDriveMode.setOnClickListener{
             if (toggleDriveMode.isChecked) {
                 toast("Automatic driving is WIP.")
+            }
+        }
+    }
+
+    // PulseCount should only be 1 or 2.
+    @RequiresApi(Build.VERSION_CODES.Q)
+    private fun vibrateDevice(pulseCount: Int) {
+        var pulses = pulseCount
+        when (pulses) {
+            1 -> {
+                var effect: VibrationEffect = VibrationEffect.createPredefined(VibrationEffect.EFFECT_CLICK)
+                vibrator!!.vibrate(effect)
+            }
+            2 -> {
+                var effect: VibrationEffect = VibrationEffect.createPredefined(VibrationEffect.EFFECT_DOUBLE_CLICK)
+                vibrator!!.vibrate(effect)
             }
         }
     }
