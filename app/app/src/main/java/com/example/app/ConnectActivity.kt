@@ -46,7 +46,9 @@ class ConnectActivity : AppCompatActivity() {
         buttonRight.setOnClickListener { sendMessage("r") }
         buttonStop.setOnClickListener { sendMessage("§") }
         buttonExit.setOnClickListener { disconnect() }
+
         toggleDriveMode.setOnClickListener{
+
             if (toggleDriveMode.isChecked) {
                 toast("Automatic driving is WIP.")
             }

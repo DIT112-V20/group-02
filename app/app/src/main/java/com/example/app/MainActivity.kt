@@ -34,6 +34,7 @@ class MainActivity : AppCompatActivity() {
 
         connect_to_car.setOnClickListener{ connectCar() }
         switch_bluetooth.setOnClickListener { toggleBluetooth() }
+        help_button.setOnClickListener { helpButton() }
     }
 
     private fun toggleBluetooth() {
@@ -79,4 +80,10 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
     }
+
+    private fun helpButton(){
+        val intent = Intent(this, HelpActivity::class.java)
+        startActivity(intent)
+    }
+
 }

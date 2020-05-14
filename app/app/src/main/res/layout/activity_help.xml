@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/background_help">
+
+
+    <ScrollView
+        android:id="@+id/scrollView2"
+        android:layout_width="369dp"
+        android:layout_height="600dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.778">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@android:color/transparent"
+                android:contentDescription="@string/tutorial"
+                android:padding="10dp"
+                android:src="@drawable/toggle_bluetooth" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="81dp"
+                android:fontFamily="@font/segoeui"
+                android:paddingHorizontal="4dp"
+                android:text="@string/toggle_bluetooth_tutorial"
+                android:textAlignment="center"
+                android:textSize="18sp" />
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@android:color/transparent"
+                android:contentDescription="@string/tutorial"
+                android:padding="10dp"
+                android:src="@drawable/control_car_tutorial_image" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="81dp"
+                android:fontFamily="@font/segoeui"
+                android:paddingHorizontal="4dp"
+                android:text="@string/control_car_tutorial"
+                android:textAlignment="center"
+                android:textSize="18sp" />
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@android:color/transparent"
+                android:contentDescription="@string/tutorial"
+                android:padding="10dp"
+                android:src="@drawable/car_control_manual" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="179dp"
+                android:fontFamily="@font/segoeui"
+                android:paddingHorizontal="4dp"
+                android:text="@string/manual_control_tutorial"
+                android:textAlignment="center"
+                android:textSize="18sp" />
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@android:color/transparent"
+                android:contentDescription="@string/tutorial"
+                android:padding="10dp"
+                android:src="@drawable/stop_button_picture" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="61dp"
+                android:fontFamily="@font/segoeui"
+                android:paddingHorizontal="4dp"
+                android:text="@string/stop_car_tutorial"
+                android:textAlignment="center"
+                android:textSize="18sp" />
+
+            <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/transparent"
+            android:contentDescription="@string/tutorial"
+            android:padding="10dp"
+            android:src="@drawable/drive_mode_button" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="104dp"
+                android:fontFamily="@font/segoeui"
+                android:paddingHorizontal="4dp"
+                android:text="@string/change_mode_tutorial"
+                android:textAlignment="center"
+                android:textSize="18sp" />
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@android:color/transparent"
+                android:contentDescription="@string/tutorial"
+                android:padding="10dp"
+                android:src="@drawable/decrease_and_increase_speed" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="133dp"
+                android:fontFamily="@font/segoeui"
+                android:paddingHorizontal="4dp"
+                android:text="@string/change_speed_tutorial"
+                android:textAlignment="center"
+                android:textSize="18sp" />
+
+        </LinearLayout>
+    </ScrollView>
+
+    <Button
+        android:id="@+id/buttonExit"
+        style="?android:attr/borderlessButtonStyle"
+        android:layout_width="24dp"
+        android:layout_height="38dp"
+        android:background="@drawable/ic_return"
+        android:backgroundTint="#87FFFFFF"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.041"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.051" />
+
+    <TextView
+        android:id="@+id/textView5"
+        android:layout_width="264dp"
+        android:layout_height="50dp"
+        android:fontFamily="@font/segoebold"
+        android:text="@string/help_tutorial"
+        android:textColor="#FFFFFF"
+        android:textSize="30sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.496"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.036" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
