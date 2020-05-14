@@ -14,11 +14,8 @@ const int FRONT_MIN_OBSTACLE = 150; // Minimum distance for Micro-LIDAR
 const int GYROSCOPE_OFFSET = 13;
 const unsigned int MAX_DISTANCE = 100; // Max distance to measure with ultrasonic
 const float SPEEDCHANGE = 0.1;         // Used when increasing and decreasing speed. Might need a new more concrete name?
-// Autodrive direction variables
-const int ORIENTATION_NORTH = 0;
-const int ORIENTATION_EAST = 1;
-const int ORIENTATION_SOUTH = 2;
-const int ORIENTATION_WEST = 3;
+const int RIGHT_TURN = 1;
+const int LEFT_TURN = -1;
 
 // Variables
 float currentSpeed;
@@ -231,6 +228,57 @@ void stopCar()
     car.setSpeed(0);
 }
 
+// Auto forward drive
+void autoDriveForward()
+{
+    readBluetooth();
+    driveForward();
+    writeBluetooth('f');
+    checkFrontObstacle();
+    checkLeftObstacle();
+    checkRightObstacle();
+}
+
+// Auto left turn
+void autoTurnLeft()
+{
+    rotateOnSpot(LEFT);
+    writeBluetooth('l');
+    checkFrontObstacle();
+    checkLeftObstacle();
+    checkRightObstacle();
+}
+
+// Auto right turn
+void autoTurnRight()
+{
+    rotateOnSpot(RIGHT);
+    writeBluetooth('r');
+    checkFrontObstacle();
+    checkLeftObstacle();
+    checkRightObstacle();
+}
+
+// Auto backwards drive
+void autoDriveBackward()
+{
+    readBluetooth();
+    driveBackward();
+    writeBluetooth('b');
+    checkFrontObstacle();
+    checkLeftObstacle();
+    checkRightObstacle();
+}
+
+void autoStop()
+{
+    stopCar();
+    writeBluetooth('s');
+    checkFrontObstacle();
+    checkLeftObstacle();
+    checkRightObstacle();
+}
+
 // Not yet used. Will most likely not be used. Here for testing.
 void driveDistance(long distance, float speed)
 {
@@ -280,149 +328,84 @@ void checkRightObstacle()
     atObstacleRight = (rightDistance > 0 && rightDistance <= SIDE_MIN_OBSTACLE) ? true : false;
 }
 
-// Automated driving with obstacle avoidance
+// Automated driving with obstacle avoidance helper
 void automatedDriving()
 {
     checkFrontObstacle();
-    // Drive forward until there is an obstacle in front of car
     while (!atObstacleFront && autoDrivingEnabled)
-    {
-        readBluetooth();
-        driveForward();
-        writeBluetooth('f');
-        checkFrontObstacle();
+    { // Drive forward until there is an obstacle in front
+        autoDriveForward();
     }
     if (autoDrivingEnabled)
-    { // Skip if user cancels auto mode
-        stopCar();
-        writeBluetooth('s');
-
-        checkLeftObstacle();
-        checkRightObstacle();
-
-        rotateOnSpot(RIGHT);
-        writeBluetooth('r');
-        avoidObstacle(0, ORIENTATION_EAST); // Initialise obstacle avoidance with a right
+    { // Skip obstacle avoidance if canceled
+        while (atObstacleLeft && atObstacleRight && autoDrivingEnabled)
+        { // If car is blocked on all sides, drive backwards until car is clear of obstacles
+            autoDriveBackward();
+        }
+        autoStop();
+        if (atObstacleLeft && !atObstacleRight && autoDrivingEnabled)
+        { // If right side is clear, start obstacle avoidance on right side
+            autoTurnRight();
+            avoidObstacle(RIGHT_TURN, atObstacleLeft, atObstacleRight, LEFT_TURN, RIGHT_TURN, autoTurnLeft, autoTurnRight);
+        }
+        else if (!atObstacleLeft && atObstacleRight && autoDrivingEnabled)
+        { // If left side is clear, start obstacle avoidance on left side
+            autoTurnLeft();
+            avoidObstacle(LEFT_TURN, atObstacleRight, atObstacleLeft, RIGHT_TURN, LEFT_TURN, autoTurnRight, autoTurnLeft);
+        }
+        else
+        { // If car get stuck, send error and exit
+            writeBluetooth('e');
+            autoDrivingEnabled = false;
+            return;
+        }
     }
-}
-
-// Reusable method for driving forwards and calculation position
-void forwardObstacleDrive(float &position, int turns)
-{
-    readBluetooth();
-    checkFrontObstacle();
-    checkLeftObstacle();
-    checkRightObstacle();
-
-    if (abs(position) < 0.1 && turns % 4 == ORIENTATION_WEST) //TODO: update threshold if needed
-    {                                                         // If we are driving back left and get close to the starting line threshold, exit obstacle avoidance
-        stopCar();
-        writeBluetooth('s');
-        rotateOnSpot(RIGHT);
-        writeBluetooth('r');
-        return;
-    }
-    float tempDistance = car.getDistance();
-
-    driveForward();
-    writeBluetooth('f');
-
-    position += getPositionDiff(tempDistance, car.getDistance(), turns);
 }
 
 // Recursively avoids obstacles
-void avoidObstacle(float position, int turns)
+void avoidObstacle(
+    int orientation,
+    boolean atObsFirst,
+    boolean atObsSecond,
+    int firstTurn,
+    int secondTurn,
+    void firstTurnFun(),
+    void secondTurnFun())
 {
-    /* Implementing the "Wall Follower" algorithm for maze solving.
-       Always have the obstacle to the left of the car. If we return to the
-       straight line the car was on before encountering the obstacle, we are clear
-        of the obstacle. */
+    if (orientation % 4 == 0)
+        return;
 
-    float tempDistance;
-
-    while (!atObstacleFront && atObstacleLeft && autoDrivingEnabled)
-    { // Drives forward until obstacle appears ahead or obstacle clears to the left
-        forwardObstacleDrive(position, turns);
+    // Depending on first turn, prioritize turns differently
+    while (atObsFirst && !atObstacleFront && autoDrivingEnabled)
+    { // Drive forward until there is an obstacle in front or an opening to the first prioritized side
+        autoDriveForward();
     }
-    if (autoDrivingEnabled)
-    { // Skip if user cancels auto mode
-        stopCar();
-        writeBluetooth('s');
-        // Priority of car movmement behaviour: left > right > backwards
-        if (!atObstacleLeft)
-        { // If left side is clear, rotate left and iterate through obstacle avoidance again
-            rotateOnSpot(LEFT);
-            writeBluetooth('l');
-
-            checkRightObstacle();
-            checkLeftObstacle();
-            checkFrontObstacle();
-
-            while (!atObstacleLeft && !atObstacleFront && autoDrivingEnabled)
-            { // Drives forward until obstacle appears ahead or to the left
-                forwardObstacleDrive(position, turns);
-            }
-            avoidObstacle(position, turns - 1);
+    while (atObsFirst && atObsSecond && autoDrivingEnabled)
+    { // If car is blocked on all sides, drive backwards until car is clear of obstacles
+        autoDriveBackward();
+    }
+    autoStop();
+    if (!atObsFirst && autoDrivingEnabled)
+    { // If first prioritized side is clear, turn to that side
+        firstTurnFun();
+        while (!atObsFirst && !atObstacleFront && autoDrivingEnabled)
+        { // Position car next to first prioritized wall to prevent turn looping
+            autoDriveForward();
         }
-        else if (!atObstacleRight)
-        { // If right side is clear, rotate right and iterate through obstacle avoidance again
-            rotateOnSpot(RIGHT);
-            writeBluetooth('r');
-
-            checkRightObstacle();
-            checkLeftObstacle();
-            checkFrontObstacle();
-
-            avoidObstacle(position, turns + 1);
-        }
-        else if (atObstacleFront)
-        { // If all sides and front aren't clear, drive backwards until right side gets cleared
-            tempDistance = car.getDistance();
-
-            while (atObstacleRight && autoDrivingEnabled)
-            {
-                readBluetooth();
-                driveBackward();
-                writeBluetooth('b');
-                checkRightObstacle();
-            }
-            if (autoDrivingEnabled)
-            { // Skip if user cancels auto mode
-                stopCar();
-                writeBluetooth('s');
-                position -= getPositionDiff(tempDistance, car.getDistance(), turns);
-
-                rotateOnSpot(RIGHT);
-                writeBluetooth('r');
-
-                checkRightObstacle();
-                checkLeftObstacle();
-                checkFrontObstacle();
-
-                while (!atObstacleLeft && !atObstacleFront && autoDrivingEnabled)
-                {
-                    forwardObstacleDrive(position, turns);
-                }
-                avoidObstacle(position, turns + 1);
-            }
-        }
+        autoStop();
+        avoidObstacle(orientation + firstTurn, atObsFirst, atObsSecond, firstTurn, secondTurn, firstTurnFun, secondTurnFun);
     }
-}
-
-float getPositionDiff(float initialDistance, float finalDistance, int turns)
-{
-    /* Returns the distance travelled long the x axis (vertically of car).
-    Positive if the car is travelling right, negative if the car is travelling to the west.
-    We are not concerned with the position relative north and south so will return 0.0 in that case */
-    if (turns % 4 == ORIENTATION_EAST)
-    {
-        return finalDistance - initialDistance;
+    else if (!atObsSecond && autoDrivingEnabled)
+    { // If second prioritized side is clear, turn to that side
+        secondTurnFun();
+        avoidObstacle(orientation + secondTurn, atObsFirst, atObsSecond, firstTurn, secondTurn, firstTurnFun, secondTurnFun);
     }
-    else if (turns % 4 == ORIENTATION_WEST)
-    {
-        return -(finalDistance - initialDistance);
+    else
+    { // If car get stuck, send error and exit
+        writeBluetooth('e');
+        autoDrivingEnabled = false;
+        return;
     }
-    return 0.0;
 }
 
 // Drive inputs
