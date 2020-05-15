@@ -65,10 +65,7 @@ class ConnectActivity : AppCompatActivity() {
                     }
             }
 
-        readMessage()
     }
-
-
 
     private fun sendMessage(message: String) {
         if (m_bluetoothSocket != null) {
@@ -97,9 +94,8 @@ class ConnectActivity : AppCompatActivity() {
             }
         }
 
-
-
     }
+
 
     private fun disconnect() {
         if (m_bluetoothSocket != null) {
