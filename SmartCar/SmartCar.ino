@@ -268,7 +268,7 @@ void driveDistance(long distance, float speed)
 // Obstacle interference
 void checkFrontObstacle()
 {
-    frontDistance = (frontSensor.readRangeSingleMillimeters() - frontSensorError);
+    frontDistance = (frontSensor.readRangeSingleMillimeters());
     if (frontSensor.timeoutOccurred())
     {
         Serial.print("VL53L0X sensor timeout occurred.");
