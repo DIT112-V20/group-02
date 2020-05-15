@@ -290,22 +290,25 @@ void checkRightObstacle()
 
 void automatedDriving()
 {
+    //Drive forward until there is an obstacle infron of car.
+    driveForward(); 
     while(autoDrivingEnabled){
         checkFrontObstacle();
-        //Drive forward until there is an obstacle infron of car.
-        while(!atObstacleFront)
+        if(!atObstacleFront)
         {
             driveForward();
             checkFrontObstacle();
         }
-        stopCar();
-        checkLeftObstacle();
-        checkRightObstacle();
-        if(atObstacleLeft && !atObstacleRight){rotateOnSpot(RIGHT);}             // If obstacle at left but not right, trun right.
-        if(!atObstacleLeft && atObstacleRight){rotateOnSpot(LEFT);}         // If obstacle at right but not left, turn left.
-        if(!atObstacleRight && !atObstacleLeft){rotateOnSpot(RIGHT);}       // If both sides are clear, turn right.
-        //TODO Need to refine the driving. At the moment the car just drives forward as standard. We want the car to avoid the obstacle and
-        // then resume the original path. We also need a way to break out of automatic driving.
+        else
+        {
+            checkLeftObstacle();
+            checkRightObstacle();
+
+            if (!atObstacleLeft && atObstacleRight){ rotateOnSpot(LEFT);} // If obstacle at right but not left, turn left.
+            else if(!atObstacleLeft && !atObstacleRight){ rotateOnSpot(RIGHT);} // If both sides are clear, turn right.
+            else if(atObstacleLeft  && !atObstacleRight){ rotateOnSpot(RIGHT);} // If obstacle at left but not right, trun right.
+            //else if(atObstacleLeft  && atObstacleRight){ driveDistance(30, -SPEED);} 
+        }
     }
 }
 
