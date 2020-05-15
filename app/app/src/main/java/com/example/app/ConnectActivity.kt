@@ -65,15 +65,10 @@ class ConnectActivity : AppCompatActivity() {
                     }
             }
 
-        while(m_isConnected){
-            var input = readMessage()
-            if (input != null) {
-                //playSound(input)
-            } else {
-                toast("Input is null")
-            }
-        }
+        readMessage()
     }
+
+
 
     private fun sendMessage(message: String) {
         if (m_bluetoothSocket != null) {
@@ -85,7 +80,26 @@ class ConnectActivity : AppCompatActivity() {
         }
     }
 
-    private fun readMessage(){}
+    private fun readMessage(){
+        val inputStream = m_bluetoothSocket!!.inputStream
+        val buffer = ByteArray(1024)
+        var bytes: Int
+
+        while (true){
+            try{
+                bytes = inputStream.read(buffer)
+                val readMessage = String(buffer, 0,bytes)
+                toast("Bluetooth message read: $readMessage")
+            } catch (e: IOException){
+                e.printStackTrace()
+                toast("Cannot read bluetoothinput")
+                break
+            }
+        }
+
+
+
+    }
 
     private fun disconnect() {
         if (m_bluetoothSocket != null) {
