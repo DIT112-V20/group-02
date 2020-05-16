@@ -29,7 +29,6 @@ class ConnectActivity : AppCompatActivity() {
 
     //private const val TAG = "Group 2 - Debug:"
     private var automaticDriving: Boolean = false
-    private var threadCheck: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?){
         super.onCreate(savedInstanceState)
@@ -38,9 +37,6 @@ class ConnectActivity : AppCompatActivity() {
         m_address = "FC:F5:C4:0F:87:62"
         // Run the ConnectToDevice method
         ConnectToDevice(this).execute()
-
-        val thread = SimpleThread()
-
 
         if(m_isConnected){
             toast("Connected to car")
@@ -59,12 +55,6 @@ class ConnectActivity : AppCompatActivity() {
 
             if (toggleDriveMode.isChecked) {
                 sendMessage("a")
-
-                if(!threadCheck){
-                    thread.start()
-                    threadCheck = true
-                }
-
                 automaticDriving = true
                 toast("Automatic driving is active.")
             } else {
@@ -142,27 +132,6 @@ class ConnectActivity : AppCompatActivity() {
         }
     }
 
-    class SimpleThread: Thread() {
-        public override fun run() {
-            val inputStream = m_bluetoothSocket!!.inputStream
-            val buffer = ByteArray(1024)
-            var bytes: Int
-
-            while (true){
-                try{
-                    bytes = inputStream.read(buffer)
-                    val readMessage = String(buffer, 0,bytes)
-                    Log.i("data", "MESSAGE READ FROM INPUT: $readMessage")
-
-                } catch (e: IOException){
-                    e.printStackTrace()
-                    break
-                }
-            }
-        }
-
-
-    }
     //Class in charge of connecting the device with the car
     private class ConnectToDevice(c: Context) : AsyncTask<Void, Void, String>(){
 
