@@ -30,6 +30,7 @@ class ConnectActivity : AppCompatActivity() {
 
     //private const val TAG = "Group 2 - Debug:"
     private var automaticDriving: Boolean = false
+    private val readMessageWorkRequest = OneTimeWorkRequestBuilder<readMessageWorker>().build()
 
     override fun onCreate(savedInstanceState: Bundle?){
         super.onCreate(savedInstanceState)
@@ -57,6 +58,7 @@ class ConnectActivity : AppCompatActivity() {
             if (toggleDriveMode.isChecked) {
                     sendMessage("a")
                     automaticDriving = true
+                    WorkManager.getInstance(myContext).enqueue(readMessageWorkRequest)
                     toast("Automatic driving is active.")
             } else {
                     sendMessage("m")
@@ -95,6 +97,15 @@ class ConnectActivity : AppCompatActivity() {
             }
         }
 
+    }
+
+
+
+    class readMessageWorker(appContext: Context, workerParams: WorkerParameters) : Worker(appContext, workerParams) {
+        override fun doWork(): Result {
+            readMessage()
+            return Result.success()
+        }
     }
 
     private fun disconnect() {
