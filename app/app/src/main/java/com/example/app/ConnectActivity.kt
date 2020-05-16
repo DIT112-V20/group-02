@@ -28,6 +28,7 @@ class ConnectActivity : AppCompatActivity() {
 
     private var vibrator: Vibrator? = null
 
+    @RequiresApi(Build.VERSION_CODES.Q)
     override fun onCreate(savedInstanceState: Bundle?){
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_connect)
@@ -44,11 +45,26 @@ class ConnectActivity : AppCompatActivity() {
 
         vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
 
-        buttonForward.setOnClickListener { sendMessage("f") }
-        buttonBackward.setOnClickListener { sendMessage("b") }
-        buttonLeft.setOnClickListener { sendMessage("l") }
-        buttonRight.setOnClickListener { sendMessage("r") }
-        buttonStop.setOnClickListener { sendMessage("§") }
+        buttonForward.setOnClickListener {
+            vibrateDevice(500)
+            sendMessage("f")
+        }
+        buttonBackward.setOnClickListener {
+            sendMessage("b")
+            vibrateDevice(500)
+        }
+        buttonLeft.setOnClickListener {
+            sendMessage("l")
+            vibrateDevice(500)
+        }
+        buttonRight.setOnClickListener {
+            sendMessage("r")
+            vibrateDevice(500)
+        }
+        buttonStop.setOnClickListener {
+            sendMessage("§")
+            vibrateDevice(500)
+        }
         buttonExit.setOnClickListener { disconnect() }
         toggleDriveMode.setOnClickListener{
             if (toggleDriveMode.isChecked) {
@@ -59,18 +75,9 @@ class ConnectActivity : AppCompatActivity() {
 
     // PulseCount should only be 1 or 2.
     @RequiresApi(Build.VERSION_CODES.Q)
-    private fun vibrateDevice(pulseCount: Int) {
-        var pulses = pulseCount
-        when (pulses) {
-            1 -> {
-                var effect: VibrationEffect = VibrationEffect.createPredefined(VibrationEffect.EFFECT_CLICK)
-                vibrator!!.vibrate(effect)
-            }
-            2 -> {
-                var effect: VibrationEffect = VibrationEffect.createPredefined(VibrationEffect.EFFECT_DOUBLE_CLICK)
-                vibrator!!.vibrate(effect)
-            }
-        }
+    private fun vibrateDevice(duration: Long) {
+        val effect = VibrationEffect.createOneShot(duration, VibrationEffect.DEFAULT_AMPLITUDE)
+        vibrator!!.vibrate(effect)
     }
 
     private fun sendMessage(message: String) {
