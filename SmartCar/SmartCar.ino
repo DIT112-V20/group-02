@@ -2,31 +2,23 @@
 #include <BluetoothSerial.h>
 #include <Wire.h>
 #include <VL53L0X.h>
-//#include <WebServer.h>
-//#include <WiFi.h>
-//#include <ESPmDNS.h>
 
 BluetoothSerial bluetooth;
-//WebServer server(80);
 
 // Constansts
 const float SPEED = 0.8;                // Standard Speed in m/s
 const int RIGHT = 90;                   // 90 Degrees to turn on spot right
 const int LEFT = -90;                   // 90 Degrees to turn on spot left
-const int SIDE_MIN_OBSTACLE = 22;       // Minimum distance for SR04
-const int FRONT_MIN_OBSTACLE = 150;     // Minimum distance for Micro-LIDAR
+const int SIDE_MIN_OBSTACLE = 20;       // Minimum distance for SR04
+const int FRONT_MIN_OBSTACLE = 200;     // Minimum distance for Micro-LIDAR
 const int GYROSCOPE_OFFSET = 13;
 const unsigned int MAX_DISTANCE = 100;  // Max distance to measure with ultrasonic
 const float SPEEDCHANGE = 0.1;          // Used when increasing and decreasing speed. Might need a new more concrete name?
-//const auto ssid = "yourSSID";
-//const auto password = "yourWifiPassword";
 
 //Variables
 float currentSpeed;
 
 // Unsigned
-unsigned int sideSensorError = 3;       //Errormargin for side sensors
-unsigned int frontSensorError = 30;     //Errormargin for front ensor
 unsigned int frontDistance;
 unsigned int leftDistance;
 unsigned int rightDistance;
@@ -77,35 +69,8 @@ void setup()
         {
         }
     }
-    frontSensor.startContinuous(100);
+    frontSensor.startContinuous();
     bluetooth.begin("Group 2 SmartCar");
-    /*//----------------------- wifi setup 
-    WiFi.mode(WIFI_STA);
-    WiFi.begin(ssid, password);
-    Serial.println("");
-
-    // Wait for connection
-    while (WiFi.status() != WL_CONNECTED)
-    {
-        delay(500);
-        Serial.print(".");
-    }
-    Serial.println("");
-    Serial.print("Connected to ");
-    Serial.println(ssid);
-    Serial.print("IP address: ");
-    Serial.println(WiFi.localIP());
-
-    if (MDNS.begin("smartcar"))
-    {
-        Serial.println("MDNS responder started");
-    }
-
-    server.onNotFound(
-        []() { server.send(404, "text/plain", "Unknown command"); });
-
-    server.begin();
-    Serial.println("HTTP server started");*/
 }
 
 //Rotate on spot function for the automaticDriving
@@ -265,42 +230,48 @@ void driveDistance(long distance, float speed)
     stopCar();
 }
 
-// Obstacle interference
+
+//Medianfilter, used in order to get five values from frontsensor and then set frontDistance to the medain value.
+void medianFilter()
+{
+
+  int frontSensorReadings[5]; //Array to store the five readings
+  for(int i = 0; i < 5; i++)
+  {
+      frontSensorReadings[i] = frontSensor.readRangeContinuousMillimeters();
+  }
+
+  frontDistance = smartcarlib::utils::getMedian(frontSensorReadings,5);
+}
+
+// ObstacleAvoidance
 void checkFrontObstacle()
 {
-    frontDistance = (frontSensor.readRangeSingleMillimeters());
-    if (frontSensor.timeoutOccurred())
-    {
-        Serial.print("VL53L0X sensor timeout occurred.");
-    }
-    atObstacleFront = (frontDistance > 0 && frontDistance <= FRONT_MIN_OBSTACLE) ? true : false;
+    medianFilter();
+    atObstacleFront =  frontDistance <= FRONT_MIN_OBSTACLE && frontDistance > 0;
 }
 
 void checkLeftObstacle()
 {
     leftDistance = leftSensor.getDistance();
-    atObstacleLeft = (leftDistance > 0 && leftDistance <= SIDE_MIN_OBSTACLE) ? true : false;
+    atObstacleLeft = leftDistance > 0 && leftDistance <= SIDE_MIN_OBSTACLE;
 }
 
 void checkRightObstacle()
 {
     rightDistance = rightSensor.getDistance();
-    atObstacleRight = (rightDistance > 0 && rightDistance <= SIDE_MIN_OBSTACLE) ? true : false;
+    atObstacleRight = rightDistance > 0 && rightDistance <= SIDE_MIN_OBSTACLE;
 }
 
 void automatedDriving()
 {
-    //Drive forward until there is an obstacle infron of car.
-    driveForward(); 
     while(autoDrivingEnabled){
+        //Drive forward until there is an obstacle infron of car.
+        driveForward(); 
         checkFrontObstacle();
-        if(!atObstacleFront)
+        if (atObstacleFront)
         {
-            driveForward();
-            checkFrontObstacle();
-        }
-        else
-        {
+            stopCar();
             checkLeftObstacle();
             checkRightObstacle();
 
@@ -386,9 +357,9 @@ void readBluetooth()
     }
 }
 
+
 void loop()
 {
     readBluetooth();
-    //server.handleClient();
     car.update();
 }
