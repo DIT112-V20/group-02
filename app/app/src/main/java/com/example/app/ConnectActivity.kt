@@ -4,6 +4,8 @@ import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothSocket
 import android.content.Context
+import android.media.MediaPlayer
+import android.os.AsyncTask
 import android.os.*
 import androidx.appcompat.app.AppCompatActivity
 import android.util.Log
@@ -12,8 +14,8 @@ import kotlinx.android.synthetic.main.activity_connect.*
 import org.jetbrains.anko.toast
 import java.io.IOException
 import java.util.*
+import kotlin.concurrent.thread
 
-private const val TAG = "Group 2 - Debug:"
 
 class ConnectActivity : AppCompatActivity() {
 
@@ -26,9 +28,14 @@ class ConnectActivity : AppCompatActivity() {
         var m_address: String? = null
     }
 
+
+    //private const val TAG = "Group 2 - Debug:"
+    private var automaticDriving: Boolean = false
+
     private var vibrator: Vibrator? = null
 
     @RequiresApi(Build.VERSION_CODES.Q)
+
     override fun onCreate(savedInstanceState: Bundle?){
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_connect)
@@ -43,6 +50,11 @@ class ConnectActivity : AppCompatActivity() {
             toast("Not connected to car")
         }
 
+        buttonForward.setOnClickListener { sendMessage("f") }
+        buttonBackward.setOnClickListener { sendMessage("b") }
+        buttonLeft.setOnClickListener { sendMessage("l") }
+        buttonRight.setOnClickListener { sendMessage("r") }
+        buttonStop.setOnClickListener { sendMessage("§")                                        }
         vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
 
         buttonForward.setOnClickListener {
@@ -70,9 +82,17 @@ class ConnectActivity : AppCompatActivity() {
         toggleDriveMode.setOnClickListener{
 
             if (toggleDriveMode.isChecked) {
-                toast("Automatic driving is WIP.")
+                sendMessage("a")
+                automaticDriving = true
+                toast("Automatic driving is active.")
+            } else {
+                sendMessage("m")
+                automaticDriving = false
+                toast("Manual driving is active.")
             }
         }
+
+
     }
 
     // PulseCount should only be 1 or 2.
@@ -87,10 +107,31 @@ class ConnectActivity : AppCompatActivity() {
             try {
                 m_bluetoothSocket!!.outputStream.write(message.toByteArray())
             } catch (e: IOException) {
-                Log.e(TAG, "Error writing message")
+                Log.e("data", "Error writing message")
             }
         }
     }
+
+    private fun readMessage(){
+        val inputStream = m_bluetoothSocket!!.inputStream
+        val buffer = ByteArray(1024)
+        var bytes: Int
+
+        while (true){
+            try{
+                bytes = inputStream.read(buffer)
+                val readMessage = String(buffer, 0,bytes)
+                toast("Bluetooth message read: $readMessage")
+            } catch (e: IOException){
+                e.printStackTrace()
+                toast("Cannot read bluetoothinput")
+                break
+            }
+        }
+
+    }
+
+
 
     private fun disconnect() {
         if (m_bluetoothSocket != null) {
@@ -105,15 +146,37 @@ class ConnectActivity : AppCompatActivity() {
         finish()
     }
 
+    fun playSound(input: Char){
+        if(input == 'f'){
+            var drivingForward = MediaPlayer.create(this, R.raw.driving_forward)
+            drivingForward!!.start()
+        } else if (input == 's'){
+            var carStopped = MediaPlayer.create(this, R.raw.car_stopped)
+            carStopped!!.start()
+        } else if (input == 'r'){
+            var turningRight = MediaPlayer.create(this, R.raw.turning_right)
+            turningRight!!.start()
+        } else if (input == 'l'){
+            var turningLeft = MediaPlayer.create(this, R.raw.turning_left)
+            turningLeft!!.start()
+        } else if (input == 'b'){
+            var drivingBackwards = MediaPlayer.create(this, R.raw.driving_backwards)
+            drivingBackwards!!.start()
+        } else {
+            return;
+        }
+    }
+
     //Class in charge of connecting the device with the car
     private class ConnectToDevice(c: Context) : AsyncTask<Void, Void, String>(){
 
         private var connectSuccess: Boolean = true
-        private val context: Context = c
+        private val context: Context
 
-        override fun onPreExecute() {
-            super.onPreExecute()
+        init {
+            this.context = c
         }
+
         //Connect device to car
         override fun doInBackground(vararg params: Void?): String? {
             try {
@@ -135,13 +198,15 @@ class ConnectActivity : AppCompatActivity() {
             }
             return null
         }
-      
+
         override fun onPostExecute(result: String?) {
             super.onPostExecute(result)
             if(!connectSuccess){
-                Log.i(TAG, "could not connect")
+                Log.i("data", "could not connect")
             } else {
                 m_isConnected = true
+
+
             }
         }
     }
