@@ -73,6 +73,8 @@ class ConnectActivity : AppCompatActivity() {
                 toast("Manual driving is active.")
             }
         }
+
+
     }
 
     private fun sendMessage(message: String) {
@@ -101,7 +103,10 @@ class ConnectActivity : AppCompatActivity() {
                 break
             }
         }
+
     }
+
+
 
     private fun disconnect() {
         if (m_bluetoothSocket != null) {
@@ -116,7 +121,7 @@ class ConnectActivity : AppCompatActivity() {
         finish()
     }
 
-    private fun playSound(input: Char){
+    fun playSound(input: Char){
         if(input == 'f'){
             var drivingForward = MediaPlayer.create(this, R.raw.driving_forward)
             drivingForward!!.start()
@@ -147,12 +152,16 @@ class ConnectActivity : AppCompatActivity() {
                 try{
                     bytes = inputStream.read(buffer)
                     val readMessage = String(buffer, 0,bytes)
+                    Log.i("data", "MESSAGE READ FROM INPUT: $readMessage")
+
                 } catch (e: IOException){
                     e.printStackTrace()
                     break
                 }
             }
         }
+
+
     }
     //Class in charge of connecting the device with the car
     private class ConnectToDevice(c: Context) : AsyncTask<Void, Void, String>(){
