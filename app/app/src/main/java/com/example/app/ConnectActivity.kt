@@ -14,7 +14,6 @@ import kotlinx.android.synthetic.main.activity_connect.*
 import org.jetbrains.anko.toast
 import java.io.IOException
 import java.util.*
-import kotlin.concurrent.thread
 
 
 class ConnectActivity : AppCompatActivity() {
@@ -26,12 +25,12 @@ class ConnectActivity : AppCompatActivity() {
         var m_bluetoothAdapter: BluetoothAdapter? = null
         var m_isConnected: Boolean = false
         var m_address: String? = null
+
     }
 
 
     //private const val TAG = "Group 2 - Debug:"
     private var automaticDriving: Boolean = false
-
     private var vibrator: Vibrator? = null
 
     @RequiresApi(Build.VERSION_CODES.Q)
@@ -43,6 +42,7 @@ class ConnectActivity : AppCompatActivity() {
         m_address = "FC:F5:C4:0F:87:62"
         // Run the ConnectToDevice method
         ConnectToDevice(this).execute()
+        ContinuousReading(this)
 
         if(m_isConnected){
             toast("Connected to car")
@@ -84,7 +84,7 @@ class ConnectActivity : AppCompatActivity() {
             if (toggleDriveMode.isChecked) {
                 sendMessage("a")
                 automaticDriving = true
-                continuousInputReading(this).execute()
+                ContinuousReading(this).execute()
                 toast("Automatic driving is active.")
             } else {
                 sendMessage("m")
@@ -113,47 +113,26 @@ class ConnectActivity : AppCompatActivity() {
         }
     }
 
-    private fun readMessage(){
+    fun readMessage(){
+
         val inputStream = m_bluetoothSocket!!.inputStream
         val buffer = ByteArray(1024)
         var bytes: Int
-        var readMessage = null
+        var message: String? = null
         while (true){
             try{
                 bytes = inputStream.read(buffer)
-                readMessage = String(buffer, 0,bytes)
-                toast("Bluetooth message read: $readMessage")
-                if (readMessage != null){
-                    playSound(readMessage)
-                    break
-                }
+                message = String(buffer, 0,bytes)
+                toast("Bluetooth message read: $message")
+                playSound(message)
+                break
             } catch (e: IOException){
                 e.printStackTrace()
                 toast("Cannot read bluetoothinput")
                 break
             }
-
-        }
-
-    }
-
-    private class continuousInputReading(c: Context) : AsyncTask<Void, Void, String>(){
-
-        private var messageRecieved: Boolean = false
-
-        override fun doInBackground(vararg params: Void?): String?{
-            try {
-                readMessage()
-            }catch (e: IOException){
-                toast("Failed to read Input in background")
-                e.printStackTrace()
-            }
-            return null
         }
     }
-
-
-
     private fun disconnect() {
         if (m_bluetoothSocket != null) {
             try {
@@ -167,20 +146,20 @@ class ConnectActivity : AppCompatActivity() {
         finish()
     }
 
-    fun playSound(input: Char){
-        if(input == 'f'){
+    private fun playSound(input: String){
+        if(input == "f"){
             var drivingForward = MediaPlayer.create(this, R.raw.driving_forward)
             drivingForward!!.start()
-        } else if (input == 's'){
+        } else if (input == "f"){
             var carStopped = MediaPlayer.create(this, R.raw.car_stopped)
             carStopped!!.start()
-        } else if (input == 'r'){
+        } else if (input == "f"){
             var turningRight = MediaPlayer.create(this, R.raw.turning_right)
             turningRight!!.start()
-        } else if (input == 'l'){
+        } else if (input == "f"){
             var turningLeft = MediaPlayer.create(this, R.raw.turning_left)
             turningLeft!!.start()
-        } else if (input == 'b'){
+        } else if (input == "f"){
             var drivingBackwards = MediaPlayer.create(this, R.raw.driving_backwards)
             drivingBackwards!!.start()
         } else {
@@ -188,15 +167,24 @@ class ConnectActivity : AppCompatActivity() {
         }
     }
 
+
+    private class ContinuousReading(private var connectActivity: ConnectActivity) : AsyncTask<Void, Void, String>(){
+        
+        override fun doInBackground(vararg params: Void?): String?{
+            try {
+                connectActivity.readMessage()
+            }catch (e: IOException){
+                e.printStackTrace()
+            }
+            return null
+        }
+    }
+
     //Class in charge of connecting the device with the car
     private class ConnectToDevice(c: Context) : AsyncTask<Void, Void, String>(){
 
         private var connectSuccess: Boolean = true
-        private val context: Context
-
-        init {
-            this.context = c
-        }
+        private val context: Context = c
 
         //Connect device to car
         override fun doInBackground(vararg params: Void?): String? {
