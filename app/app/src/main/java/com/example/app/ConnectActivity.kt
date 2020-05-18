@@ -84,6 +84,7 @@ class ConnectActivity : AppCompatActivity() {
             if (toggleDriveMode.isChecked) {
                 sendMessage("a")
                 automaticDriving = true
+                continuousInputReading(this).execute()
                 toast("Automatic driving is active.")
             } else {
                 sendMessage("m")
@@ -116,19 +117,39 @@ class ConnectActivity : AppCompatActivity() {
         val inputStream = m_bluetoothSocket!!.inputStream
         val buffer = ByteArray(1024)
         var bytes: Int
-
+        var readMessage = null
         while (true){
             try{
                 bytes = inputStream.read(buffer)
-                val readMessage = String(buffer, 0,bytes)
+                readMessage = String(buffer, 0,bytes)
                 toast("Bluetooth message read: $readMessage")
+                if (readMessage != null){
+                    playSound(readMessage)
+                    break
+                }
             } catch (e: IOException){
                 e.printStackTrace()
                 toast("Cannot read bluetoothinput")
                 break
             }
+
         }
 
+    }
+
+    private class continuousInputReading(c: Context) : AsyncTask<Void, Void, String>(){
+
+        private var messageRecieved: Boolean = false
+
+        override fun doInBackground(vararg params: Void?): String?{
+            try {
+                readMessage()
+            }catch (e: IOException){
+                toast("Failed to read Input in background")
+                e.printStackTrace()
+            }
+            return null
+        }
     }
 
 
@@ -205,8 +226,6 @@ class ConnectActivity : AppCompatActivity() {
                 Log.i("data", "could not connect")
             } else {
                 m_isConnected = true
-
-
             }
         }
     }
