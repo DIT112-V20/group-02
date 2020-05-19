@@ -7,13 +7,20 @@ import android.content.Context
 import android.media.MediaPlayer
 import android.os.AsyncTask
 import android.os.*
+import android.renderscript.Sampler
 import androidx.appcompat.app.AppCompatActivity
 import android.util.Log
 import androidx.annotation.RequiresApi
 import kotlinx.android.synthetic.main.activity_connect.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers.Default
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.toast
 import java.io.IOException
 import java.util.*
+import kotlin.concurrent.thread
+import kotlin.properties.Delegates
 
 
 class ConnectActivity : AppCompatActivity() {
@@ -32,6 +39,7 @@ class ConnectActivity : AppCompatActivity() {
     //private const val TAG = "Group 2 - Debug:"
     private var automaticDriving: Boolean = false
     private var vibrator: Vibrator? = null
+    private val t = Thread()
 
     @RequiresApi(Build.VERSION_CODES.Q)
 
@@ -42,7 +50,7 @@ class ConnectActivity : AppCompatActivity() {
         m_address = "FC:F5:C4:0F:87:62"
         // Run the ConnectToDevice method
         ConnectToDevice(this).execute()
-        ContinuousReading(this)
+        //ContinuousReading(this)
 
         if(m_isConnected){
             toast("Connected to car")
@@ -84,7 +92,10 @@ class ConnectActivity : AppCompatActivity() {
             if (toggleDriveMode.isChecked) {
                 sendMessage("a")
                 automaticDriving = true
-                ContinuousReading(this).execute()
+                //ContinuousReading(this).execute()
+                CoroutineScope(Default).launch {
+                    messageToSound()
+                }
                 toast("Automatic driving is active.")
             } else {
                 sendMessage("m")
@@ -113,26 +124,36 @@ class ConnectActivity : AppCompatActivity() {
         }
     }
 
-    fun readMessage(){
-
-        val inputStream = m_bluetoothSocket!!.inputStream
-        val buffer = ByteArray(1024)
-        var bytes: Int
-        var message: String? = null
-        while (true){
-            try{
-                bytes = inputStream.read(buffer)
-                message = String(buffer, 0,bytes)
-                toast("Bluetooth message read: $message")
-                playSound(message)
-                break
-            } catch (e: IOException){
-                e.printStackTrace()
-                toast("Cannot read bluetoothinput")
-                break
+    private suspend fun messageToSound() {
+        //later cahnge to use automaticdriving boolean?
+        while(true)  {
+            val soundToPlay = readMessage()
+            if(soundToPlay != null){
+                playSound(soundToPlay)
             }
         }
     }
+
+    private suspend fun readMessage() : String? {
+        val inputStream = m_bluetoothSocket!!.inputStream
+        val buffer = ByteArray(1024)
+        var bytes: Int
+        var message: String?
+
+        return try {
+            bytes = inputStream.read(buffer)
+            message = String(buffer, 0, bytes)
+            //toast("Bluetooth message read: $message")
+            message
+
+        } catch (e: IOException) {
+            e.printStackTrace()
+            //toast("Cannot read bluetoothinput")
+            null
+        }
+
+    }
+
     private fun disconnect() {
         if (m_bluetoothSocket != null) {
             try {
@@ -150,35 +171,41 @@ class ConnectActivity : AppCompatActivity() {
         if(input == "f"){
             var drivingForward = MediaPlayer.create(this, R.raw.driving_forward)
             drivingForward!!.start()
-        } else if (input == "f"){
+        } else if (input == "s"){
             var carStopped = MediaPlayer.create(this, R.raw.car_stopped)
             carStopped!!.start()
-        } else if (input == "f"){
+        } else if (input == "r"){
             var turningRight = MediaPlayer.create(this, R.raw.turning_right)
             turningRight!!.start()
-        } else if (input == "f"){
+        } else if (input == "l"){
             var turningLeft = MediaPlayer.create(this, R.raw.turning_left)
             turningLeft!!.start()
-        } else if (input == "f"){
+        } else if (input == "b"){
             var drivingBackwards = MediaPlayer.create(this, R.raw.driving_backwards)
             drivingBackwards!!.start()
         } else {
             return;
         }
     }
+    /*
+    interface ValueChangeListener {
+        fun onValueChanged(newValue:String)
+    }
 
-
-    private class ContinuousReading(private var connectActivity: ConnectActivity) : AsyncTask<Void, Void, String>(){
-        
-        override fun doInBackground(vararg params: Void?): String?{
-            try {
-                connectActivity.readMessage()
-            }catch (e: IOException){
-                e.printStackTrace()
-            }
-            return null
+    class PlayingSoundUsingInputListener(private val connectActivity: ConnectActivity) : ValueChangeListener {
+        override fun onValueChanged(newValue: String) {
+            connectActivity.playSound(newValue)
         }
     }
+
+    class ObservableObject (listener: ValueChangeListener){
+        var text: String by Delegates.observable(
+            initialValue = "",
+            onChange = {
+                prop, old, new ->
+                listener.onValueChanged(new)
+            })
+    }*/
 
     //Class in charge of connecting the device with the car
     private class ConnectToDevice(c: Context) : AsyncTask<Void, Void, String>(){
