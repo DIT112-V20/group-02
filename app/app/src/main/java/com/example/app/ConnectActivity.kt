@@ -85,10 +85,30 @@ class ConnectActivity : AppCompatActivity() {
                 sendMessage("a")
                 automaticDriving = true
                 toast("Automatic driving is active.")
+
+                // Make buttons un-clickable in automatic driving mode.
+                buttonForward.isEnabled = false
+                buttonBackward.isEnabled = false
+                buttonLeft.isEnabled = false
+                buttonRight.isEnabled = false
+                buttonAccelerate.isEnabled = false
+                button_decrease_speed.isEnabled = false
+                buttonStop.isEnabled = false
+
             } else {
                 sendMessage("m")
                 automaticDriving = false
                 toast("Manual driving is active.")
+
+                // Make buttons clickable in manual driving mode.
+                buttonForward.isEnabled = true
+                buttonBackward.isEnabled = true
+                buttonLeft.isEnabled = true
+                buttonRight.isEnabled = true
+                buttonAccelerate.isEnabled = true
+                button_decrease_speed.isEnabled = true
+                buttonStop.isEnabled = true
+
             }
         }
 
