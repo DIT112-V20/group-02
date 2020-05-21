@@ -7,21 +7,16 @@ import android.content.Context
 import android.media.MediaPlayer
 import android.os.AsyncTask
 import android.os.*
-import android.renderscript.Sampler
 import androidx.appcompat.app.AppCompatActivity
 import android.util.Log
 import androidx.annotation.RequiresApi
 import kotlinx.android.synthetic.main.activity_connect.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.Default
-import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.toast
 import java.io.IOException
 import java.util.*
-import kotlin.concurrent.thread
-import kotlin.properties.Delegates
-
 
 class ConnectActivity : AppCompatActivity() {
 
@@ -34,7 +29,6 @@ class ConnectActivity : AppCompatActivity() {
         var m_address: String? = null
 
     }
-
 
     //private const val TAG = "Group 2 - Debug:"
     private var automaticDriving: Boolean = false
@@ -58,11 +52,6 @@ class ConnectActivity : AppCompatActivity() {
             toast("Not connected to car")
         }
 
-        buttonForward.setOnClickListener { sendMessage("f") }
-        buttonBackward.setOnClickListener { sendMessage("b") }
-        buttonLeft.setOnClickListener { sendMessage("l") }
-        buttonRight.setOnClickListener { sendMessage("r") }
-        buttonStop.setOnClickListener { sendMessage("§")                                        }
         vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
 
         buttonForward.setOnClickListener {
@@ -92,7 +81,7 @@ class ConnectActivity : AppCompatActivity() {
             if (toggleDriveMode.isChecked) {
                 sendMessage("a")
                 automaticDriving = true
-                //ContinuousReading(this).execute()
+                //Creates a Coroutine to run the messageToSound() continously.
                 CoroutineScope(Default).launch {
                     messageToSound()
                 }
@@ -103,8 +92,6 @@ class ConnectActivity : AppCompatActivity() {
                 toast("Manual driving is active.")
             }
         }
-
-
     }
 
     // PulseCount should only be 1 or 2.
@@ -114,6 +101,7 @@ class ConnectActivity : AppCompatActivity() {
         vibrator!!.vibrate(effect)
     }
 
+    /*Sends message over bluetooth.*/
     private fun sendMessage(message: String) {
         if (m_bluetoothSocket != null) {
             try {
@@ -124,16 +112,20 @@ class ConnectActivity : AppCompatActivity() {
         }
     }
 
+    /* Takes input from bluetooth and sends the input to the playSound-method.*/
     private suspend fun messageToSound() {
-        //later cahnge to use automaticdriving boolean?
-        while(true)  {
+        var previousMessage: String? = null
+        while(automaticDriving)  {
             val soundToPlay = readMessage()
-            if(soundToPlay != null){
+            //Checks if message is equal to the last played message to avoid repetition.
+            if(soundToPlay != null && soundToPlay != previousMessage){
                 playSound(soundToPlay)
+                previousMessage = soundToPlay
             }
         }
     }
 
+    /* Bluetooth byte to String translator. Reads byte input from bluetooth and returns a String.*/
     private suspend fun readMessage() : String? {
         val inputStream = m_bluetoothSocket!!.inputStream
         val buffer = ByteArray(1024)
@@ -143,17 +135,15 @@ class ConnectActivity : AppCompatActivity() {
         return try {
             bytes = inputStream.read(buffer)
             message = String(buffer, 0, bytes)
-            //toast("Bluetooth message read: $message")
             message
 
         } catch (e: IOException) {
             e.printStackTrace()
-            //toast("Cannot read bluetoothinput")
             null
         }
-
     }
 
+    /*Closes the bluetooth socket and the activity*/
     private fun disconnect() {
         if (m_bluetoothSocket != null) {
             try {
@@ -167,6 +157,7 @@ class ConnectActivity : AppCompatActivity() {
         finish()
     }
 
+    /*Takes a String as input and plays corresponding sound.*/
     private fun playSound(input: String){
         if(input == "f"){
             var drivingForward = MediaPlayer.create(this, R.raw.driving_forward)
@@ -187,27 +178,8 @@ class ConnectActivity : AppCompatActivity() {
             return;
         }
     }
-    /*
-    interface ValueChangeListener {
-        fun onValueChanged(newValue:String)
-    }
 
-    class PlayingSoundUsingInputListener(private val connectActivity: ConnectActivity) : ValueChangeListener {
-        override fun onValueChanged(newValue: String) {
-            connectActivity.playSound(newValue)
-        }
-    }
-
-    class ObservableObject (listener: ValueChangeListener){
-        var text: String by Delegates.observable(
-            initialValue = "",
-            onChange = {
-                prop, old, new ->
-                listener.onValueChanged(new)
-            })
-    }*/
-
-    //Class in charge of connecting the device with the car
+    /*Class in charge of connecting the device with the car.*/
     private class ConnectToDevice(c: Context) : AsyncTask<Void, Void, String>(){
 
         private var connectSuccess: Boolean = true
