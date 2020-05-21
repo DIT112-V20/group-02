@@ -11,11 +11,12 @@ import androidx.appcompat.app.AppCompatActivity
 import android.util.Log
 import androidx.annotation.RequiresApi
 import kotlinx.android.synthetic.main.activity_connect.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers.Default
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.toast
 import java.io.IOException
 import java.util.*
-import kotlin.concurrent.thread
-
 
 class ConnectActivity : AppCompatActivity() {
 
@@ -26,13 +27,13 @@ class ConnectActivity : AppCompatActivity() {
         var m_bluetoothAdapter: BluetoothAdapter? = null
         var m_isConnected: Boolean = false
         var m_address: String? = null
-    }
 
+    }
 
     //private const val TAG = "Group 2 - Debug:"
     private var automaticDriving: Boolean = false
-
     private var vibrator: Vibrator? = null
+    private val t = Thread()
 
     @RequiresApi(Build.VERSION_CODES.Q)
 
@@ -43,6 +44,7 @@ class ConnectActivity : AppCompatActivity() {
         m_address = "FC:F5:C4:0F:87:62"
         // Run the ConnectToDevice method
         ConnectToDevice(this).execute()
+        //ContinuousReading(this)
 
         if(m_isConnected){
             toast("Connected to car")
@@ -50,11 +52,6 @@ class ConnectActivity : AppCompatActivity() {
             toast("Not connected to car")
         }
 
-        buttonForward.setOnClickListener { sendMessage("f") }
-        buttonBackward.setOnClickListener { sendMessage("b") }
-        buttonLeft.setOnClickListener { sendMessage("l") }
-        buttonRight.setOnClickListener { sendMessage("r") }
-        buttonStop.setOnClickListener { sendMessage("§")                                        }
         vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
 
         buttonForward.setOnClickListener {
@@ -84,6 +81,10 @@ class ConnectActivity : AppCompatActivity() {
             if (toggleDriveMode.isChecked) {
                 sendMessage("a")
                 automaticDriving = true
+                //Creates a Coroutine to run the messageToSound() continously.
+                CoroutineScope(Default).launch {
+                    messageToSound()
+                }
                 toast("Automatic driving is active.")
 
                 // Make buttons un-clickable in automatic driving mode.
@@ -111,8 +112,6 @@ class ConnectActivity : AppCompatActivity() {
 
             }
         }
-
-
     }
 
     // PulseCount should only be 1 or 2.
@@ -122,6 +121,7 @@ class ConnectActivity : AppCompatActivity() {
         vibrator!!.vibrate(effect)
     }
 
+    /*Sends message over bluetooth.*/
     private fun sendMessage(message: String) {
         if (m_bluetoothSocket != null) {
             try {
@@ -132,27 +132,38 @@ class ConnectActivity : AppCompatActivity() {
         }
     }
 
-    private fun readMessage(){
+    /* Takes input from bluetooth and sends the input to the playSound-method.*/
+    private suspend fun messageToSound() {
+        var previousMessage: String? = null
+        while(automaticDriving)  {
+            val soundToPlay = readMessage()
+            //Checks if message is equal to the last played message to avoid repetition.
+            if(soundToPlay != null && soundToPlay != previousMessage){
+                playSound(soundToPlay)
+                previousMessage = soundToPlay
+            }
+        }
+    }
+
+    /* Bluetooth byte to String translator. Reads byte input from bluetooth and returns a String.*/
+    private suspend fun readMessage() : String? {
         val inputStream = m_bluetoothSocket!!.inputStream
         val buffer = ByteArray(1024)
         var bytes: Int
+        var message: String?
 
-        while (true){
-            try{
-                bytes = inputStream.read(buffer)
-                val readMessage = String(buffer, 0,bytes)
-                toast("Bluetooth message read: $readMessage")
-            } catch (e: IOException){
-                e.printStackTrace()
-                toast("Cannot read bluetoothinput")
-                break
-            }
+        return try {
+            bytes = inputStream.read(buffer)
+            message = String(buffer, 0, bytes)
+            message
+
+        } catch (e: IOException) {
+            e.printStackTrace()
+            null
         }
-
     }
 
-
-
+    /*Closes the bluetooth socket and the activity*/
     private fun disconnect() {
         if (m_bluetoothSocket != null) {
             try {
@@ -166,20 +177,21 @@ class ConnectActivity : AppCompatActivity() {
         finish()
     }
 
-    fun playSound(input: Char){
-        if(input == 'f'){
+    /*Takes a String as input and plays corresponding sound.*/
+    private fun playSound(input: String){
+        if(input == "f"){
             var drivingForward = MediaPlayer.create(this, R.raw.driving_forward)
             drivingForward!!.start()
-        } else if (input == 's'){
+        } else if (input == "s"){
             var carStopped = MediaPlayer.create(this, R.raw.car_stopped)
             carStopped!!.start()
-        } else if (input == 'r'){
+        } else if (input == "r"){
             var turningRight = MediaPlayer.create(this, R.raw.turning_right)
             turningRight!!.start()
-        } else if (input == 'l'){
+        } else if (input == "l"){
             var turningLeft = MediaPlayer.create(this, R.raw.turning_left)
             turningLeft!!.start()
-        } else if (input == 'b'){
+        } else if (input == "b"){
             var drivingBackwards = MediaPlayer.create(this, R.raw.driving_backwards)
             drivingBackwards!!.start()
         } else {
@@ -187,15 +199,11 @@ class ConnectActivity : AppCompatActivity() {
         }
     }
 
-    //Class in charge of connecting the device with the car
+    /*Class in charge of connecting the device with the car.*/
     private class ConnectToDevice(c: Context) : AsyncTask<Void, Void, String>(){
 
         private var connectSuccess: Boolean = true
-        private val context: Context
-
-        init {
-            this.context = c
-        }
+        private val context: Context = c
 
         //Connect device to car
         override fun doInBackground(vararg params: Void?): String? {
@@ -225,8 +233,6 @@ class ConnectActivity : AppCompatActivity() {
                 Log.i("data", "could not connect")
             } else {
                 m_isConnected = true
-
-
             }
         }
     }

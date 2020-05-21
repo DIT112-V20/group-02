@@ -311,18 +311,22 @@ void manualControl(char input)
 
     case 'f': // Forward
         driveForward();
+        bluetooth.print('f');
         break;
 
     case 'b': // Backwards
         driveBackward();
+        bluetooth.print('b');
         break;
 
     case 'l': // Left turn
         rotate(LEFT, SPEED);
+        bluetooth.print('l');
         break;
 
     case 'r': // Right turn
         rotate(RIGHT, SPEED);
+        bluetooth.print('r');
         break;
 
     case 'k': // Left backwards turn
@@ -343,6 +347,7 @@ void manualControl(char input)
 
     default:
         stopCar();
+        bluetooth.print('s');
     }
 }
 
