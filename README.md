@@ -4,11 +4,11 @@
 
 ### What are you going to make?
 
-We've developed an Eye-Seeing-Car for people with hearing or visual impairments. The car is able to take input as commands and use sensors to drive, notice and alert of obstacles in its path. The car is controlled through the app we've developed, which connects to the car through Bluetooth. The app will also notify the user with the help of vibrations and sounds.
+We've developed an Eye-Seeing-Car for visual impairment people. The car is able to take inputs as commands and use sensors to drive and notice and alert of obstacles in its path. This is controled through the app we've developed which connects to the car through Bluetooth. The app will also notify the user with the help of vibrations and sounds.
 
 ### Why will you make it?
 
-There are countless people in the world who struggle with disabilities or impedances that most people aren’t even aware about. The aim of this prototype is to be a more reliable, manageable, and convenient way for people to be assisted with their struggles.
+There are countless people in the world who struggle with disabilities or impedances that most people aren’t even aware about. The aim of this prototype is to be a more reliable, manageable, and convenient way for people to cope with their struggles.
 
 ### How are you going to make it?
 
@@ -18,30 +18,31 @@ With the provided arduino car, included hardware, and external devices that comm
 
 ![Main menu](https://i.imgur.com/EzbjDVa.png)
 
-1. Begin by toggling Bluetooth on by clicking the toggle Bluetooth switch
-2. Click the Control Car button
+1. Begin by toggling Bluetooth on by clicking the toggle Bluetooth switch.
+2. Click the Control Car button.
+
 
 
 ![Control menu](https://i.imgur.com/TSSbWCN.png)
 
-1. To control the car manually, click any of the direction arrows
-2. To change the speed, click "-" to decrease and "+" to increase
+1. To control the car manually, click any of the direction arrows.
+2. To change the speed, click "-" to decrease and "+" to increase.
 3. To stop the car, click the stop sign.
-4. To switch to auto, click the manual button to switch to auto.
-5. To switch back, click the auto button.
+3. To switch to auto, click the manual button to switch to auto.
+4. To switch back, click the auto button.
 
 
 ![Help menu](https://i.imgur.com/92QkWTV.png)
 
 For more help, please see our included help page within the app.
 
-
-## Hardware
+## Specifications
+### Hardware
 
 - [Arduino Board](http://arduinoinfo.mywikis.net/wiki/Esp32#-_.22ESP32_Dev_Kit_V2.22)
 - [Smart Car](https://www.hackster.io/platisd/getting-started-with-the-smartcar-platform-1648ad)
 
-## Software
+### Software
 
 - [SmartCar Library](https://www.arduinolibraries.info/libraries/smartcar-shield)
 - [Arduino IDE](https://www.arduino.cc/)
