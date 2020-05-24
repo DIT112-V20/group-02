@@ -4,11 +4,11 @@
 
 ### What are you going to make?
 
-We've developed an Eye-Seeing-Car for visual impairment people. The car is able to take inputs as commands and use sensors to drive and notice and alert of obstacles in its path. This is controled through the app we've developed which connects to the car through Bluetooth. The app will also notify the user with the help of vibrations and sounds.
+We've developed an Eye-Seeing-Car for people with hearing or visual impairments. The car is able to take input as commands and use sensors to drive, notice and alert of obstacles in its path. The car is controlled through the app we've developed, which connects to the car through Bluetooth. The app will also notify the user with the help of vibrations and sounds.
 
 ### Why will you make it?
 
-There are countless people in the world who struggle with disabilities or impedances that most people aren’t even aware about. The aim of this prototype is to be a more reliable, manageable, and convenient way for people to cope with their struggles.
+There are countless people in the world who struggle with disabilities or impedances that most people aren’t even aware about. The aim of this prototype is to be a more reliable, manageable, and convenient way for people to be assisted with their struggles.
 
 ### How are you going to make it?
 
