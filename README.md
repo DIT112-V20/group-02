@@ -27,13 +27,14 @@ With the provided arduino car, included hardware, and external devices that comm
 
 1. To control the car manually, click any of the direction arrows
 2. To change the speed, click "-" to decrease and "+" to increase
+3. To stop the car, click the stop sign.
 3. To switch to auto, click the manual button to switch to auto.
 4. To switch back, click the auto button.
 
 
 ![Help menu](https://i.imgur.com/92QkWTV.png)
 
-For more help, please see our included help page in the app.
+For more help, please see our included help page within the app.
 
 ## Hardware
 
