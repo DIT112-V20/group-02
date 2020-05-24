@@ -35,19 +35,19 @@ With the provided arduino car, included hardware, and external devices that comm
 
 For more help, please see our included help page in the app.
 
-## Hardware:
+## Hardware
 
 - [Arduino Board](http://arduinoinfo.mywikis.net/wiki/Esp32#-_.22ESP32_Dev_Kit_V2.22)
 - [Smart Car](https://www.hackster.io/platisd/getting-started-with-the-smartcar-platform-1648ad)
 
-## Software:
+## Software
 
 - [SmartCar Library](https://www.arduinolibraries.info/libraries/smartcar-shield)
 - [Arduino IDE](https://www.arduino.cc/)
 - [VS Code](https://code.visualstudio.com/)
 - [Android Studio](https://developer.android.com/studio)
 
-## Developers:
+## Developers
 
 - Clementine Jensen
 - Christian O'Neill
