@@ -35,7 +35,7 @@ With the provided arduino car, included hardware, and external devices that comm
 
 1. [Download](https://github.com/DIT112-V20/group-02/archive/master.zip) the package from our GitHub page
 2. Copy the SmartCar.ino file to your SmartCar ([using Arduino IDE](https://www.arduino.cc/en/guide/Environment#toc9))
-3. Upload the app to your Android device or through an emulator ([using Android Studios](https://developer.android.com/training/basics/firstapp/running-app))
+3. Upload the app to your Android device ([using Android Studios](https://developer.android.com/training/basics/firstapp/running-app))
 
 ### How to use <a name="use"></a>
 
