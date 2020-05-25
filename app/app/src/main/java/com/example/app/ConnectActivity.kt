@@ -35,8 +35,6 @@ class ConnectActivity : AppCompatActivity() {
     private var vibrator: Vibrator? = null
     private val t = Thread()
 
-    @RequiresApi(Build.VERSION_CODES.Q)
-
     override fun onCreate(savedInstanceState: Bundle?){
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_connect)
@@ -46,34 +44,17 @@ class ConnectActivity : AppCompatActivity() {
         ConnectToDevice(this).execute()
         //ContinuousReading(this)
 
-        if(m_isConnected){
-            toast("Connected to car")
-        } else {
-            toast("Not connected to car")
-        }
+
 
         vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
 
-        buttonForward.setOnClickListener {
-            vibrateDevice(500)
-            sendMessage("f")
-        }
-        buttonBackward.setOnClickListener {
-            sendMessage("b")
-            vibrateDevice(500)
-        }
-        buttonLeft.setOnClickListener {
-            sendMessage("l")
-            vibrateDevice(500)
-        }
-        buttonRight.setOnClickListener {
-            sendMessage("r")
-            vibrateDevice(500)
-        }
-        buttonStop.setOnClickListener {
-            sendMessage("§")
-            vibrateDevice(500)
-        }
+        buttonForward.setOnClickListener { sendMessage("f") }
+        buttonBackward.setOnClickListener { sendMessage("b") }
+        buttonLeft.setOnClickListener { sendMessage("l") }
+        buttonRight.setOnClickListener { sendMessage("r") }
+        buttonStop.setOnClickListener { sendMessage("§") }
+        buttonAccelerate.setOnClickListener { sendMessage("i") }
+        button_decrease_speed.setOnClickListener { sendMessage("d") }
         buttonExit.setOnClickListener { disconnect() }
 
         toggleDriveMode.setOnClickListener{
@@ -133,6 +114,7 @@ class ConnectActivity : AppCompatActivity() {
     }
 
     /* Takes input from bluetooth and sends the input to the playSound-method.*/
+    @RequiresApi(Build.VERSION_CODES.Q)
     private suspend fun messageToSound() {
         var previousMessage: String? = null
         while(automaticDriving)  {
@@ -178,7 +160,9 @@ class ConnectActivity : AppCompatActivity() {
     }
 
     /*Takes a String as input and plays corresponding sound.*/
+    @RequiresApi(Build.VERSION_CODES.Q)
     private fun playSound(input: String){
+
         if(input == "f"){
             var drivingForward = MediaPlayer.create(this, R.raw.driving_forward)
             drivingForward!!.start()
@@ -197,6 +181,8 @@ class ConnectActivity : AppCompatActivity() {
         } else {
             return;
         }
+
+        vibrateDevice(500)
     }
 
     /*Class in charge of connecting the device with the car.*/
