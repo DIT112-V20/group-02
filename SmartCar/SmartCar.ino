@@ -11,7 +11,7 @@ const int RIGHT = 90;                   // 90 Degrees to turn on spot right
 const int LEFT = -90;                   // 90 Degrees to turn on spot left
 const int SIDE_MIN_OBSTACLE = 20;       // Minimum distance for SR04
 const int FRONT_MIN_OBSTACLE = 200;     // Minimum distance for Micro-LIDAR
-const int GYROSCOPE_OFFSET = 13;
+const int GYROSCOPE_OFFSET = 14;
 const unsigned int MAX_DISTANCE = 100;  // Max distance to measure with ultrasonic
 const float SPEEDCHANGE = 0.1;          // Used when increasing and decreasing speed. Might need a new more concrete name?
 
@@ -118,6 +118,7 @@ void rotateOnSpot(int targetDegrees)
     }
     car.setSpeed(0);
     car.enableCruiseControl();          //ReEnable cruiseControl
+    car.update();
 }
 
 // Car rotate for manualControl
@@ -267,34 +268,29 @@ void automatedDriving()
 {
     while(autoDrivingEnabled){
         //Drive forward until there is an obstacle infron of car.
+        writeBluetooth('f');
+        delay(500);
         driveForward(); 
         checkFrontObstacle();
+
         if (atObstacleFront)
         {
             stopCar();
+            writeBluetooth('s');
             checkLeftObstacle();
             checkRightObstacle();
+            delay(500);
 
-            if (!atObstacleLeft && atObstacleRight){ rotateOnSpot(LEFT);} // If obstacle at right but not left, turn left.
-            else if(!atObstacleLeft && !atObstacleRight){ rotateOnSpot(RIGHT);} // If both sides are clear, turn right.
-            else if(atObstacleLeft  && !atObstacleRight){ rotateOnSpot(RIGHT);} // If obstacle at left but not right, trun right.
-            //else if(atObstacleLeft  && atObstacleRight){ driveDistance(30, -SPEED);} 
+            if (!atObstacleLeft && atObstacleRight){ writeBluetooth('l'); rotateOnSpot(LEFT); delay(500);} // If obstacle at right but not left, turn left.
+            else if(!atObstacleLeft && !atObstacleRight){ writeBluetooth('r'); rotateOnSpot(RIGHT); delay(500); } // If both sides are clear, turn right.
+            else if(atObstacleLeft  && !atObstacleRight){ writeBluetooth('r'); rotateOnSpot(RIGHT); delay(500); } // If obstacle at left but not right, trun right.
         }
-    }
-}
 
-// Not yet properly used, but will eventually trigger AutomaticDriving on and off
-void driveOption(char input)
-{
-    switch (input)
-    {
-    case 'a':
-        autoDrivingEnabled = true;
-        break;
-
-    case 'm':
-        autoDrivingEnabled = false;
-        break;
+         if(bluetooth.read() == 'm')
+        {
+            autoDrivingEnabled = false;
+            stopCar();
+        }
     }
 }
 
@@ -311,22 +307,18 @@ void manualControl(char input)
 
     case 'f': // Forward
         driveForward();
-        bluetooth.print('f');
         break;
 
     case 'b': // Backwards
         driveBackward();
-        bluetooth.print('b');
         break;
 
     case 'l': // Left turn
         rotate(LEFT, SPEED);
-        bluetooth.print('l');
         break;
 
     case 'r': // Right turn
         rotate(RIGHT, SPEED);
-        bluetooth.print('r');
         break;
 
     case 'k': // Left backwards turn
@@ -347,7 +339,6 @@ void manualControl(char input)
 
     default:
         stopCar();
-        bluetooth.print('s');
     }
 }
 
@@ -362,9 +353,19 @@ void readBluetooth()
     }
 }
 
+// Bluetooth outputs
+void writeBluetooth(byte message)
+{
+    if (bluetooth.hasClient())
+    {
+        bluetooth.write(&message, 1);
+    }
+}
+
 
 void loop()
 {
+    car.update();
     readBluetooth();
     car.update();
 }
