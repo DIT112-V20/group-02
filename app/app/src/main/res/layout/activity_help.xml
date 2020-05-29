@@ -142,7 +142,7 @@
         app:layout_constraintVertical_bias="0.051" />
 
     <TextView
-        android:id="@+id/textView5"
+        android:id="@+id/HELP"
         android:layout_width="264dp"
         android:layout_height="50dp"
         android:fontFamily="@font/segoebold"
