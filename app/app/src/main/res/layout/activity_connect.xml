@@ -7,7 +7,7 @@
     android:background="@drawable/background_drive">
 
     <TextView
-        android:id="@+id/textView3"
+        android:id="@+id/controlCarMovement"
         android:layout_width="333dp"
         android:layout_height="43dp"
         android:clickable="false"
@@ -146,7 +146,7 @@
         app:layout_constraintVertical_bias="0.709" />
 
     <TextView
-        android:id="@+id/textView2"
+        android:id="@+id/STOP"
         android:layout_width="71dp"
         android:layout_height="38dp"
         android:fontFamily="@font/segoebold"
