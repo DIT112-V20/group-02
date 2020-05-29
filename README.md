@@ -13,7 +13,8 @@
 3. [Specifications](#specs)
     1. [Hardware](#hardware)
     2. [Software](#software)
-4. [Developers](#developers)
+4. [Demo Video](#demovideo)
+5. [Developers](#developers)
 
 ## Description <a name="description"></a>
 ### What are you going to make? <a name="what"></a>
@@ -67,6 +68,10 @@ For more help, please see our included help page within the app.
 - [SmartCar Library](https://www.arduinolibraries.info/libraries/smartcar-shield)
 - [Arduino IDE](https://www.arduino.cc/)
 - [Android Studio](https://developer.android.com/studio)
+
+## Demo Video <a name = "demovideo"></a>
+
+[![Demo Video](https://img.youtube.com/vi/270hwAlUbkA/0.jpg)](https://youtu.be/270hwAlUbkA)
 
 ## Developers <a name="developers"></a>
 
