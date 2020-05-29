@@ -19,7 +19,7 @@
 ## Description <a name="description"></a>
 ### What are you going to make? <a name="what"></a>
 
-We've developed an **Eye-Seeing-Car** for people with hearing or visual impairments. The car is able to take input as commands and use sensors to drive, notice and alert of obstacles in its path. The car is controlled through **the app** we developed, which connects to the car using Bluetooth. The app will also notify the user with the help of vibration and sound.
+We've developed an **Seeing-Eye Car** for people with hearing or visual impairments. The car is able to take input as commands and use sensors to drive, notice and alert of obstacles in its path. The car is controlled through **the app** we developed, which connects to the car using Bluetooth. The app will also notify the user with the help of vibration and sound.
 
 ### Why will you make it? <a name="why"></a>
 
